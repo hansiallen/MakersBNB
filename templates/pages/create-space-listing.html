@@ -6,6 +6,11 @@
 
     <div class="create-space-box">
         <form action="./" method="POST">
+            <!-- We check to see if there are any errors from a previous submission -->
+            {% if error %}
+            <!-- If so, we show them. -->
+            <p class="error">We encountered the following error with your submission: {{ error }}</p>
+            {% endif %}
             <label for="name">Name</label>
             <input type="text" name="name" id="name">
             <label for="description">Description</label>
