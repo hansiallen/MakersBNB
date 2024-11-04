@@ -15,15 +15,29 @@ app = Flask(__name__)
 def get_index():
     return render_template('index.html')
 
-@app.route('/', methods=['GET'])
-def get_index():
-    return render_template('index.html')
+@app.route('/login', methods=['GET'])
+def get_login():
+    # should return a full login page
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def try_login():
     # takes email and password from a form
     # should give a return message as a either
-    #  sucseffuly logged in or incorrect email or password
+    #  'sucseffuly logged in' or 'incorrect email or password'
+    pass
+
+
+@app.route('/sign_up', methods=['GET'])
+def get_login():
+    # should return a full login page
+    return render_template('login.html')
+
+@app.route('/sign_up', methods=['POST'])
+def try_sign_up():
+    # takes name, email and password from a form
+    # should give a return message as a either
+    #  'sucseffuly logged in' or 'incorrect email or password'
     pass
 
 # These lines start the server if you run this file directly
