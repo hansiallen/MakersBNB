@@ -17,8 +17,7 @@ def get_index():
 
 @app.route('/login', methods=['GET'])
 def get_login():
-    # should return a full login page
-    return render_template('login.html')
+    return render_template('/pages/login.html')
 
 @app.route('/login', methods=['POST'])
 def try_login():
@@ -29,9 +28,9 @@ def try_login():
 
 
 @app.route('/sign_up', methods=['GET'])
-def get_login():
+def get_sign_up():
     # should return a full login page
-    return render_template('login.html')
+    return render_template('/pages/sign-up.html')
 
 @app.route('/sign_up', methods=['POST'])
 def try_sign_up():
