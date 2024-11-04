@@ -11,9 +11,20 @@ app = Flask(__name__)
 # Returns the homepage
 # Try it:
 #   ; open http://localhost:5001/index
-@app.route('/index', methods=['GET'])
+@app.route('/', methods=['GET'])
 def get_index():
     return render_template('index.html')
+
+@app.route('/', methods=['GET'])
+def get_index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['POST'])
+def try_login():
+    # takes email and password from a form
+    # should give a return message as a either
+    #  sucseffuly logged in or incorrect email or password
+    pass
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
