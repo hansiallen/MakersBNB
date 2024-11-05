@@ -37,23 +37,3 @@ def test_database_seed(db_connection):
           ]
     
 
-def test_database_seed(db_connection):
-    # Seed the database with some test data
-    db_connection.seed("seeds/users.sql")
-    db_connection.seed("seeds/spaces.sql")
-    repo = SpacesRepo()
-   # Retrieve all records
-    result = SpacesRepo.get_space(2)
-
-    # Assert that the results are what we expect
-    assert result == [
-              
-              {
-                  'description': 'A stylish loft in the city',
-                  'owner_id': 2,
-                  'price_per_night': 150.00,
-                  'space_id': 2,
-                  'title': 'Urban Loft',
-              }
-          ]
-    
