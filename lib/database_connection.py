@@ -10,9 +10,9 @@ from psycopg.rows import dict_row
 # That's why we have provided it!
 class DatabaseConnection:
     # VVV CHANGE BOTH OF THESE VVV
+
     DEV_DATABASE_NAME = "makersbnb"
     TEST_DATABASE_NAME = "makersbnb_test"
-
 
     def __init__(self, test_mode=False):
         self.test_mode = test_mode
@@ -22,7 +22,7 @@ class DatabaseConnection:
     def connect(self):
         try:
             self.connection = psycopg.connect(
-                f"postgresql://localhost/{self._database_name()}",
+                f"postgresql://alexandre@Xc229:localhost/{self._database_name()}",
                 row_factory=dict_row)
         except psycopg.OperationalError:
             raise Exception(f"Couldn't connect to the database {self._database_name()}! " \
