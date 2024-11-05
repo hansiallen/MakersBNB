@@ -12,7 +12,13 @@ class Space:
 
         self.id = id
 
-
+    def is_available(self, start_date, end_date):
+        
+        return all(date in self.available_dates for date in range(start_date, end_date))
+    
+    def book(self, start_date, end_date):
+        for date in range(start_date, end_date):
+            self.available_dates.remove(date)
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
