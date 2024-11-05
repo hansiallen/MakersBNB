@@ -2,7 +2,6 @@ import os, psycopg
 from flask import g
 from psycopg.rows import dict_row
 
-
 # This class helps us interact with the database
 # It wraps the underlying psycopg library that we are using.
 
@@ -21,9 +20,32 @@ class DatabaseConnection:
     # to localhost and select the database name given in argument.
     def connect(self):
         try:
-            self.connection = psycopg.connect(
-                f"postgresql://postgres:postgres@localhost:5432/{self._database_name()}",
-                row_factory=dict_row)
+            # Check if running in GitHub Actions
+            if os.getenv('GITHUB_ACTIONS') == 'true':
+                print("Running in GitHub Actions.")
+                self.connection = psycopg.connect(
+                    f"postgresql://postgres:postgres@localhost:5432/{self._database_name()}",
+                    row_factory=dict_row)
+            # Check if env variable 'render_deployment' is set to 'true'
+            elif os.getenv('render_deployment') == 'true':
+                print("Running in a render_deployment")
+                render_username = os.getenv('render_db_user')
+                render_password = os.getenv('render_db_password')
+                self.connection = psycopg.connect(
+                    f"postgresql://{render_username}:{render_password}@localhost:5432/{self._database_name()}",
+                    row_factory=dict_row)
+            # Check if env variable 'alexandre' is set to 'true'
+            elif os.getenv('alexandre') == 'true':
+                print("Running on Alexandre's machine.")
+                self.connection = psycopg.connect(
+                    f"postgresql://localhost:5432/{self._database_name()}",
+                    row_factory=dict_row)
+            else:
+                # Default case if none of the above conditions match
+                print("Running in the default local test environment.")
+                self.connection = psycopg.connect(
+                    f"postgresql://localhost/{self._database_name()}",
+                    row_factory=dict_row)
         except psycopg.OperationalError:
             raise Exception(f"Couldn't connect to the database {self._database_name()}! " \
                     f"Did you create it using `createdb {self._database_name()}`?")
