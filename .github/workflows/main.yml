@@ -45,5 +45,13 @@ jobs:
 
       # Run tests with pytest
       - name: Test with pytest
+        env:
+            PGPASSWORD: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_HOST: localhost
+            POSTGRES_PORT: 5432
         run: |
+          PGPASSWORD=$POSTGRES_PASSWORD createdb -h localhost -p 5432 -U postgres makersbnb_test
           pytest
+
