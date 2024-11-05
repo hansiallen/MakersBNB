@@ -3,3 +3,5 @@ __pycache__
 .pytest_cache
 screenshot.png
 .Venv
+makersbnb-venv
+*time_chamber*

@@ -11,6 +11,7 @@ app = Flask(__name__)
 # Returns the homepage
 # Try it:
 #   ; open http://localhost:5001/index
+
 @app.route('/index', methods=['GET'])
 def get_index():
     return render_template('index.html')
@@ -61,6 +62,10 @@ def try_sign_up():
     # should give a return message as a either
     #  sucseffuly created in or incorrect email or password
     pass
+
+@app.route('/index')
+def index():
+    return '<p>This is the homepage.</p>'
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
