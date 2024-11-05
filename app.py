@@ -44,6 +44,10 @@ def try_sign_up():
     #  'sucseffuly logged in' or 'incorrect email or password'
     pass
 
+@app.route('/index')
+def index():
+    return '<p>This is the homepage.</p>'
+
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
 # if started in test mode.

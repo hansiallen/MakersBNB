@@ -9,10 +9,14 @@ class Space:
         self.description = description
         self.price_per_night = price_per_night
         self.available_dates = available_dates
+
         self.id = id
+
+
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
     
     def __repr__(self):
+
         return f"Space({self.id}, {self.user_id}, {self.name}, {self.description}, {self.price_per_night}, {self.available_dates})"

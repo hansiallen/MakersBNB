@@ -3,17 +3,18 @@ from lib.spaces import Space
 class SpacesRepo:
     def __init__(self):
         self.spaces = {}
+
         self.next_id = 1
     
     def create_space(self, id, user_id, name, description, price_per_night, available_dates):
         new_space = Space(id, user_id, name, description, price_per_night, available_dates)
         self.add_space(new_space)
         return new_space
+   
 
     def add_space(self, space):
-        space.id = self.next_id
-        self.spaces[self.next_id] = space
-        self.next_id += 1
+        self.spaces[space.id] = space
+        
 
     def remove_space(self, space_id):
         if space_id in self.spaces:
