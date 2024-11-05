@@ -1,11 +1,10 @@
 class User:
 
-    def __init__(self, id, email, name, password):
+    def __init__(self, id, email, password):
         if not email:
             raise ValueError("Email is required")
         self.id = id
         self.email = email
-        self.name = name
         self.password = password
 
     def __eq__(self, other):
@@ -13,5 +12,5 @@ class User:
     
     def __repr__(self):
 
-        return f"User({self.id}, {self.email}, {self.name}, {self.password})"
+        return f"User({self.id}, {self.email}, {self.password})"
     
