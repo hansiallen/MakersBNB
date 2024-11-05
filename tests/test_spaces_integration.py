@@ -11,7 +11,7 @@ def setup_spaces_repo():
 
 def test_create_and_retrieve_space(setup_spaces_repo):
     repo = setup_spaces_repo
-    space = Space(1, 1, "London flat", "A small flat in the city", 50.0, ["01-12-2024", "02-12-2024"])
+    space = Space(1, 1, "London flat", "A small flat in the city", 50.0)
     
     # Add the space to the repository
     repo.add_space(space)
@@ -26,7 +26,7 @@ def test_create_and_retrieve_space(setup_spaces_repo):
 
 def test_remove_space(setup_spaces_repo):
     repo = setup_spaces_repo
-    space = Space(1, 1, "London flat", "A small flat in the city", 50.0, ["01-12-2024", "02-12-2024"])
+    space = Space(1, 1, "London flat", "A small flat in the city", 50.0)
     repo.add_space(space)
 
     # Now remove the space
@@ -48,41 +48,38 @@ def test_create_multiple_spaces(setup_spaces_repo):
     repo = setup_spaces_repo
     
     # Create multiple spaces
-    space1 = repo.create_space(
+    repo.add_space(
+        Space(
         id = 1,
         user_id=1,
         name="Beach House",
         description="A beautiful house by the beach",
-        price_per_night=120.0,
-        available_dates=["01-10-2024", "02-10-2024"]
-    )
+        price_per_night=120.0
+    ))
     
-    space2 = repo.create_space(
+    repo.add_space(
+        Space(
         id = 2,
         user_id=2,
         name="Country House",
         description="A peaceful house in the countryside",
-        price_per_night=80.0,
-        available_dates=["01-12-2024", "02-12-2024"]
-    )
+        price_per_night=80.0
+    ))
     
     # Retrieve all spaces
     all_spaces = repo.list_spaces()
     
     # Assertions
     assert len(all_spaces) == 2  # Ensure two spaces were created
-    assert space1.id in [s.id for s in all_spaces]
-    assert space2.id in [s.id for s in all_spaces]
 
 def test_space_validation():
     # Create a valid space
-    space = Space(1, 1, "Luxury Villa", "A luxurious villa with a pool", 200, ["01-01-2025"])
+    space = Space(1, 1, "Luxury Villa", "A luxurious villa with a pool", 200)
     
     # Assertions to ensure the space is created properly
     assert space.name == "Luxury Villa"
     assert space.price_per_night == 200
-    assert space.available_dates == ["01-01-2025"]
     
     # Testing invalid data (assuming you have validation in place)
     with pytest.raises(ValueError):  # Adjust based on your validation method
-        Space(2, 2, "", "Invalid space", -100, [])
+        Space(2, 2, "", "Invalid space", -100)

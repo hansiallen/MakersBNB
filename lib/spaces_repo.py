@@ -6,12 +6,6 @@ class SpacesRepo:
 
         self.next_id = 1
     
-    def create_space(self, id, user_id, name, description, price_per_night, available_dates):
-        new_space = Space(id, user_id, name, description, price_per_night, available_dates)
-        self.add_space(new_space)
-        return new_space
-   
-
     def add_space(self, space):
         self.spaces[space.id] = space
         
