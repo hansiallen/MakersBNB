@@ -12,17 +12,34 @@ app = Flask(__name__)
 # Try it:
 #   ; open http://localhost:5001/index
 
-@app.route('/index')
-def index():
-    return '<p>This is the homepage.</p>' 
-
-@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def get_index():
     return render_template('index.html')
 
+# GET /index
+# Returns the homepage
+# Try it:
+#   ; open http://localhost:5001/index
+@app.route('/', methods=['GET'])
+def get_spaces():
+    return render_template('/pages/list-spaces.html')
+
+
+@app.route('/add-spaces',methods=['POST'])
+def add_spaces():
+    # take in all the information for the space and the users id
+    # this page returns a link to redirect to the login screen if not logged in
+    pass
+
+@app.route('/space/<id>',methods=['GET'])
+def show_space_info(id):
+    # have an argument with the space id to show the correct space
+    return render_template('/pages/space.html')
+
 @app.route('/login', methods=['GET'])
 def get_login():
-    return render_template('/pages/login.html')
+    # should return a full login page
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def try_login():
@@ -37,11 +54,13 @@ def get_sign_up():
     # should return a full login page
     return render_template('/pages/sign-up.html')
 
-@app.route('/sign_up', methods=['POST'])
+
+
+@app.route('/sign-up', methods=['POST'])
 def try_sign_up():
-    # takes name, email and password from a form
+    # takes username, email and password from a form
     # should give a return message as a either
-    #  'sucseffuly logged in' or 'incorrect email or password'
+    #  sucseffuly created in or incorrect email or password
     pass
 
 @app.route('/index')
