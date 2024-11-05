@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def get_index():
-    return render_template('/page/list-spaces.html')
+    return render_template('/pages/list-spaces.html')
 
 
 @app.route('/login', methods=['GET'])
@@ -30,7 +30,7 @@ def get_spaces():
     pass
 
 @app.route('/space',methods=['GET'])
-def get_spaces():
+def add_spaces():
     # have an argument with the space id to show the correct space
     return render_template('/pages/space.html')
 
