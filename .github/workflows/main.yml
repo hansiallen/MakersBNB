@@ -42,7 +42,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install
-          createdb makersbnb_test
 
       # Run tests with pytest
       - name: Test with pytest
