@@ -1,6 +1,7 @@
 import pytest
 from lib.user_repo import UserRepo
 
+
 @pytest.fixture
 def user_repo():
     return UserRepo()
