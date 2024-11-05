@@ -3,12 +3,11 @@ from lib.spaces import Space
 class SpacesRepo:
     def __init__(self):
         self.spaces = {}
-        self.next_id = 1 
+        
 
     def add_space(self, space):
-        space.id = self.next_id
-        self.spaces[self.next_id] = space
-        self.next_id += 1
+        self.spaces[space.id] = space
+        
 
     def remove_space(self, space_id):
         if space_id in self.spaces:
