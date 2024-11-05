@@ -1,0 +1,29 @@
+{% include '/core/header.html' %}
+{% include '/core/nav.html' %}
+<main>
+    <h1>List a space</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quam lacus, vestibulum nec eleifend in, dignissim nec ex. Duis non enim ut nunc luctus hendrerit fringilla id metus. Morbi vitae ornare mi, sit amet pretium velit. Praesent laoreet mi sit amet fermentum varius. Praesent nisi augue, efficitur porta ullamcorper pulvinar, vulputate ut est. Mauris et massa eros. Phasellus nisi ante, vehicula et ultricies et, varius eu mi.</p>
+
+    <div class="create-space-box">
+        <form action="./" method="POST">
+            <!-- We check to see if there are any errors from a previous submission -->
+            {% if error %}
+            <!-- If so, we show them. -->
+            <p class="error">We encountered the following error with your submission: {{ error }}</p>
+            {% endif %}
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name">
+            <label for="description">Description</label>
+            <textarea name="description" id="description"></textarea>
+            <label for="price-per-night">Price per night (£)</label>
+            <input type="text" name="price-per-night" id="price-per-night">
+            <label for="available-from">Available from (DD/MM/YY)</label>
+            <input type="date" name="available-from" id="available-from">
+            <label for="available-to">Available to (DD/MM/YY)</label>
+            <input type="date" name="available-to" id="available-to">
+            <button type="submit">List my space</button>
+        </form>
+    </div>
+</main>
+
+{% include '/core/footer.html' %}
