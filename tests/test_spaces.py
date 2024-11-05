@@ -2,12 +2,18 @@ import pytest
 from lib.spaces import Space
 from lib.spaces_repo import *
 
+def test_is_equal():
+    space = Space(1, 1, "london flat", "a small flat", 100.0, ["01-12-2024"])
+    space2 = Space(1, 1, "london flat", "a small flat", 100.0, ["01-12-2024"])
+    assert space == space2
+
 def test_create_space():
     # Initialise the repository
     repo = SpacesRepo()
     
     # Create a new unique space
     space = repo.create_space(
+        id = 1,
         user_id = 1,
         name = "Cute cottage",
         description = "A small, cute cottage in the woods",
@@ -29,6 +35,7 @@ def test_create_multiple_spaces():
 
     # Create multiple spaces
     space1 = repo.create_space(
+        id = 1,
         user_id = 1,
         name = "Cute cottage",
         description = "A small, cute cottage in the woods",
@@ -36,6 +43,7 @@ def test_create_multiple_spaces():
         available_dates = ["01-12-2024", "02-12-2024"]
     )
     space2 = repo.create_space(
+        id = 2,
         user_id = 2 ,
         name = "Beach House",
         description = "A beautiful beach house with ocean view",
@@ -57,6 +65,7 @@ def test_get_space():
     
     # Add a space and capture the created space
     space = repo.create_space(
+        id = 1,
         user_id=1,
         name="Cute cottage",
         description="A small, cute cottage in the woods",
@@ -77,6 +86,7 @@ def test_create_space_invalid_data():
      # Try creating a space with an invalid name
     try:
         repo.create_space(
+            id = 1,
             user_id = 1,
             name = "",
             description = "A big mansion in the city",
@@ -94,6 +104,7 @@ def test_delete_space():
 
     # Add a space and delete it
     space = repo.create_space(
+        id = 1,
         user_id=1,
         name="Cute cottage",
         description="A small, cute cottage in the woods",
