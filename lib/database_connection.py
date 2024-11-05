@@ -32,8 +32,9 @@ class DatabaseConnection:
                 render_username = os.getenv('render_db_user')
                 render_password = os.getenv('render_db_password')
                 render_int_db_url = os.getenv('render_db_url')
+                render_prod_db_name = os.getenv('render_db_name')
                 self.connection = psycopg.connect(
-                    f"postgresql://{render_username}:{render_password}@{render_int_db_url}:5432/{self._database_name()}",
+                    f"postgresql://{render_username}:{render_password}@{render_int_db_url}:5432/{render_prod_db_name}",
                     row_factory=dict_row)
             # Check if env variable 'alexandre' is set to 'true'
             elif os.getenv('alexandre') == 'true':
