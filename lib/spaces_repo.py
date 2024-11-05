@@ -1,16 +1,23 @@
+from lib.spaces import Space
+
 class SpacesRepo:
     def __init__(self):
         self.spaces = {}
+        self.next_id = 1 
 
-    def add_space(self, space):    
-        self.spaces[space.id] = space
-
-    def get_space(self, space_id):
-        return self.spaces.get(space_id)
+    def add_space(self, space):
+        space.id = self.next_id
+        self.spaces[self.next_id] = space
+        self.next_id += 1
 
     def remove_space(self, space_id):
         if space_id in self.spaces:
-            del self.spaces[space_id]
+          del self.spaces[space_id]
+          return True
+        return False
+
+    def get_space(self, space_id):
+        return self.spaces.get(space_id)
     
     def list_spaces(self):
         return list(self.spaces.values())
@@ -28,3 +35,8 @@ class SpacesRepo:
             space.book(start_date, end_date)
             return True
         return False
+    
+    def create_space(self, user_id, name, description, price_per_night, available_dates):
+        new_space = Space(user_id, name, description, price_per_night, available_dates)
+        self.add_space(new_space)
+        return new_space

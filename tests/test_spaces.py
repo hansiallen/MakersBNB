@@ -1,9 +1,10 @@
 import pytest
-from spaces import Space, SpaceRepository
+from lib.spaces import Space
+from lib.spaces_repo import *
 
 def test_create_space():
     # Initialise the repository
-    repo = SpaceRepository()
+    repo = SpacesRepo()
     
     # Create a new unique space
     space = repo.create_space(
@@ -24,7 +25,7 @@ def test_create_space():
 
 def test_create_multiple_spaces():
     # initialise the repository
-    repo = SpaceRepository()
+    repo = SpacesRepo()
 
     # Create multiple spaces
     space1 = repo.create_space(
@@ -50,29 +51,30 @@ def test_create_multiple_spaces():
     assert space2.id == 2
     assert space2.name == "Beach House"
 
-def test_get_spaces():
-    # initialise the repository
-    repo = SpaceRepository()
+def test_get_space():
+    # Initialise the repository
+    repo = SpacesRepo()
     
-    # Add a space
-    repo.create_space(
-        user_id = 1,
-        name = "Cute cottage",
-        description = "A small, cute cottage in the woods",
-        price_per_night = 50.0,
-        available_dates = ["01-12-2024", "02-12-2024"]
+    # Add a space and capture the created space
+    space = repo.create_space(
+        user_id=1,
+        name="Cute cottage",
+        description="A small, cute cottage in the woods",
+        price_per_night=50.0,
+        available_dates=["01-12-2024", "02-12-2024"]
     )
-    
-    # Fetch spaces and validate
-    spaces = repo.get_spaces()
-    assert len(spaces) == 1
-    assert spaces[0].name == "Cute cottage"
+
+    # Fetch the space by its ID
+    retrieved_space = repo.get_space(space.id)  # Pass the space ID here
+
+    # Assertions
+    assert retrieved_space == space  # Check that the retrieved space matches the created space
 
 def test_create_space_invalid_data():
     # initialise the repository
-    repo = SpaceRepository()
-
-    # Try creating a space with an invalid name
+    repo = SpacesRepo()
+    
+     # Try creating a space with an invalid name
     try:
         repo.create_space(
             user_id = 1,
@@ -87,28 +89,29 @@ def test_create_space_invalid_data():
         assert False, "ValueError not raised"
 
 def test_delete_space():
-    # initialise the repository
-    repo = SpaceRepository()
+    # Initialise the repository
+    repo = SpacesRepo()
 
     # Add a space and delete it
     space = repo.create_space(
-        user_id = 1,
-        name = "Cute cottage",
-        description = "A small, cute cottage in the woods",
-        price_per_night = 50.0,
-        available_dates = ["01-12-2024", "02-12-2024"]
+        user_id=1,
+        name="Cute cottage",
+        description="A small, cute cottage in the woods",
+        price_per_night=50.0,
+        available_dates=["01-12-2024", "02-12-2024"]
     )
     space_id = space.id
-    deletion_result = repo.delete_space(space_id)
+    deletion_result = repo.remove_space(space_id)
 
     # Assertions
     assert deletion_result is True
-    assert len(repo.get_spaces()) == 0
+    # Check that the space no longer exists
+    assert repo.get_space(space_id) is None  # or whatever indicates a non-existent space
 
 def test_delete_nonexistent_space():
     # initialise the repository
-    repo = SpaceRepository()
+    repo = SpacesRepo()
     
     # Try deleting a non-existent space
-    deletion_result = repo.delete_space(999)  # Using a non-existent ID
+    deletion_result = repo.remove_space(999)  # Using a non-existent ID
     assert deletion_result is False
