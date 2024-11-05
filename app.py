@@ -25,13 +25,13 @@ def get_spaces():
 
 
 @app.route('/add-spaces',methods=['POST'])
-def get_spaces():
+def add_spaces():
     # take in all the information for the space and the users id
     # this page returns a link to redirect to the login screen if not logged in
     pass
 
-@app.route('/space',methods=['GET'])
-def add_spaces():
+@app.route('/space/<id>',methods=['GET'])
+def show_space_info(id):
     # have an argument with the space id to show the correct space
     return render_template('/pages/space.html')
 
@@ -60,29 +60,6 @@ def try_sign_up():
     # takes username, email and password from a form
     # should give a return message as a either
     #  sucseffuly created in or incorrect email or password
-    pass
-
-
-
-
-@app.route('/login', methods=['POST'])
-def try_login():
-    # takes email and password from a form
-    # should give a return message as a either
-    #  'sucseffuly logged in' or 'incorrect email or password'
-    pass
-
-
-@app.route('/sign_up', methods=['GET'])
-def get_sign_up():
-    # should return a full login page
-    return render_template('/pages/sign-up.html')
-
-@app.route('/sign_up', methods=['POST'])
-def try_sign_up():
-    # takes name, email and password from a form
-    # should give a return message as a either
-    #  'sucseffuly logged in' or 'incorrect email or password'
     pass
 
 # These lines start the server if you run this file directly
