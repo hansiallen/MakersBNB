@@ -17,10 +17,16 @@
             <textarea name="description" id="description"></textarea>
             <label for="price-per-night">Price per night (£)</label>
             <input type="text" name="price-per-night" id="price-per-night">
-            <label for="available-from">Available from (DD/MM/YY)</label>
-            <input type="date" name="available-from" id="available-from">
-            <label for="available-to">Available to (DD/MM/YY)</label>
-            <input type="date" name="available-to" id="available-to">
+            <div class="two-col-grid">
+                <div>
+                    <label for="available-from">Available from (DD/MM/YY)</label>
+                    <input type="date" name="available-from" id="available-from">
+                </div>
+                <div>
+                    <label for="available-to">Available to (DD/MM/YY)</label>
+                    <input type="date" name="available-to" id="available-to">
+                </div>
+            </div>
             <button type="submit">List my space</button>
         </form>
     </div>
