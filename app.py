@@ -64,6 +64,18 @@ def try_sign_up_route():
     #  sucseffuly created in or incorrect email or password
     pass
 
+@app.route('/about', methods=['GET'])
+def render_about_page():
+    return render_template('pages/about.html')
+
+@app.route('/privacy', methods=['GET'])
+def render_privacy_policy():
+    return render_template('pages/privacy-policy.html')
+
+@app.route('/tos', methods=['GET'])
+def render_tos_page():
+    return render_template('pages/tos.html')
+
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
 # if started in test mode.
