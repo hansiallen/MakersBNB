@@ -2,7 +2,8 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from lib.database_connection import get_flask_database_connection
-
+from lib.spaces_repo import SpacesRepo
+from lib.spaces import Space
 # Create a new Flask app
 app = Flask(__name__)
 
@@ -23,7 +24,9 @@ def get_index_route():
 #   ; open http://localhost:5001/index
 @app.route('/', methods=['GET'])
 def get_spaces_route():
-    return render_template('/pages/list-spaces.html')
+    repo = SpacesRepo(get_flask_database_connection(app))
+    spaces =repo.list_spaces()
+    return render_template('/pages/list-spaces.html', spaces =spaces)
 
 
 @app.route('/add-spaces',methods=['POST'])
@@ -63,6 +66,18 @@ def try_sign_up_route():
     # should give a return message as a either
     #  sucseffuly created in or incorrect email or password
     pass
+
+@app.route('/about', methods=['GET'])
+def render_about_page():
+    return render_template('pages/about.html')
+
+@app.route('/privacy', methods=['GET'])
+def render_privacy_policy():
+    return render_template('pages/privacy-policy.html')
+
+@app.route('/tos', methods=['GET'])
+def render_tos_page():
+    return render_template('pages/tos.html')
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
