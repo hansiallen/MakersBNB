@@ -13,7 +13,7 @@ def test_add_user(db_connection):
     # Create a new user without setting the id (it will be auto-generated)
     user = User(
         id = None,
-        email='user1@example.com',
+        email='user4@example.com',
         password='password1',
     )
     
@@ -23,44 +23,43 @@ def test_add_user(db_connection):
     # Assertions
     assert user_id is not None  # Check that the user ID is returned
 
-def test_remove_user():
+def test_remove_user(db_connection):
     """Test removing a user"""
-    # Create a mock database connection
-    db_connection = Mock()
-
-    # Create a mock result object with a rowcount attribute
-    mock_result = Mock()
-    mock_result.rowcount = 1  # Simulate that 1 row was affected (deleted)
-
-    # Mock the database execute method for deletion and checking existence
-    db_connection.execute.side_effect = [
-        [{'user_id': 1, 'email': 'user1@example.com', 'password': 'password1'}],  # For initial get_user
-        mock_result  # For delete operation, return mock result
-    ]
-
-    # Initialize UserRepo with the mock connection
+    # Seed the database with the users.sql data
+    db_connection.seed("seeds/users.sql")
+    
+    # Initialize UserRepo with the actual database connection
     user_repo = UserRepo(db_connection)
+    
+    # Create a new user (without setting the id, it will be auto-generated)
+    user = User(
+        id = 1,  # ID will be auto-generated
+        email="user4@example.com",
+        password="password1"
+    )
+    
+    # Add the user to the database and get the auto-generated user_id
+    user_id = user_repo.add_user(user)
+    
+    # Assertions: Ensure the user ID is returned and is not None
+    assert user_id is not None, "User ID should not be None"
+    
+    # Check that the user exists in the database by querying with the generated ID
+    result = db_connection.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    assert len(result) == 1, f"User with ID {user_id} should exist in the database"
+    
+    # Now, call remove_user to delete the user with the generated user_id
+    result = user_repo.remove_user(user_id)
+    
+    # Final check: Ensure the user no longer exists in the database
+    result = db_connection.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    assert len(result) == 0, f"User with ID {user_id} should have been deleted"
 
-    # Add a user to ensure they exist before removal
-    user_repo.add_user(User(id=1, email="user1@example.com", password="password1"))
-
-    # Call remove_user to delete the user with ID 1
-    result = user_repo.remove_user(1)
-
-    # Assertions to verify that the user was successfully removed
-    assert result is True  # Should return True because the mock result simulates success
-
-def test_get_user():
+def test_get_user(db_connection):
     """Test getting a user"""
-    # Create a mock database connection
-    db_connection = Mock()
+    db_connection.seed("seeds/users.sql")
 
-    # Set up the mock to return a single user record when queried
-    db_connection.execute.return_value = [
-        {'user_id': 1, 'email': 'user1@example.com', 'password': 'password1'}
-    ]
-
-    # Initialize UserRepo with the mock connection
+    # Initialize UserRepo with the connection
     user_repo = UserRepo(db_connection)
 
     # Call get_user to fetch user with ID 1
@@ -71,26 +70,22 @@ def test_get_user():
     assert user.email == 'user1@example.com'
     assert user.password == 'password1'
 
-def test_get_multiple_users():
+def test_get_multiple_users(db_connection):
     """Test getting multiple users"""
-    # Create a mock database connection
-    db_connection = Mock()
+    db_connection.seed("seeds/users.sql")
 
-    # Set up the mock to return a sample data set when queried (no 'name' field)
-    db_connection.execute.return_value = [
-        {'user_id': 1, 'email': 'user1@example.com', 'password': 'password1'},
-        {'user_id': 2, 'email': 'user2@example.com', 'password': 'password2'},
-    ]
-    
-    # Initialize UserRepo with the mock connection
+    # Initialize UserRepo with the connection
     user_repo = UserRepo(db_connection)
 
     # Retrieve all users
     users = user_repo.list_users()
 
     # Assertions
-    assert len(users) == 2
+    assert len(users) == 3
     assert users[0].email == 'user1@example.com'
     assert users[0].password == 'password1'
     assert users[1].email == 'user2@example.com'
     assert users[1].password == 'password2'
+    assert users[2].email == 'user3@example.com'
+    assert users[2].password == 'password3'
+    

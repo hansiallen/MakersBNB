@@ -14,12 +14,14 @@ class UserRepo:
             return result[0]['user_id']
         else:
             raise ValueError("Failed to add user to the database.")
-
+        
     def remove_user(self, user_id):
         """Remove a user from the database by ID."""
         query = "DELETE FROM users WHERE user_id = %s"
         result = self.db_connection.execute(query, (user_id,))
-        return result.rowcount > 0
+        if result is not None and len(result) > 0:  # Check if result is not None and affected
+            return True
+        return False
 
     def get_user(self, user_id):
         """Get a user from the database by ID."""
