@@ -6,10 +6,10 @@ class BookingRepo:
 
     def add_booking(self, booking):
         query = """
-            INSERT INTO bookings (space_id, user_id, booking_date) 
-            VALUES (%s, %s, %s) RETURNING booking_id
+            INSERT INTO bookings (space_id, user_id, start_date, end_date) 
+            VALUES (%s, %s, %s, %s) RETURNING booking_id
         """
-        result = self.db_connection.execute(query, (booking.space_id, booking.user_id, booking.booking_date))
+        result = self.db_connection.execute(query, (booking.space_id, booking.user_id, booking.start_date, booking.end_date))
         if result:
             return result[0]['booking_id']
         else:
@@ -32,11 +32,12 @@ class BookingRepo:
                 booking_data['booking_id'],
                 booking_data['space_id'],
                 booking_data['user_id'],
-                booking_data['booking_date']
+                booking_data['start_date'],
+                booking_data['end_date']
             )
         return None
 
     def list_bookings(self):
         query = "SELECT * FROM bookings"
         results = self.db_connection.execute(query)
-        return [Booking(row['booking_id'], row['space_id'], row['user_id'], row['booking_date']) for row in results]
+        return [Booking(row['booking_id'], row['space_id'], row['user_id'], row['start_date'], row['end_date']) for row in results]

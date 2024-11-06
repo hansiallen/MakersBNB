@@ -1,5 +1,3 @@
-# tests/test_booking_integration.py
-
 import pytest
 from lib.bookings import Booking
 from lib.bookings_repo import BookingRepo
@@ -16,7 +14,7 @@ from datetime import date
 
 def test_create_and_retrieve_booking(setup_booking_repo):
     repo = setup_booking_repo
-    booking = Booking(None, 1, 2, date(2024, 11, 12)) 
+    booking = Booking(None, 1, 2, date(2024, 11, 12), date(2024, 12, 12)) 
     
     booking_id = repo.add_booking(booking)
     retrieved_booking = repo.get_booking(booking_id)
@@ -24,12 +22,13 @@ def test_create_and_retrieve_booking(setup_booking_repo):
     assert retrieved_booking is not None
     assert retrieved_booking.space_id == 1
     assert retrieved_booking.user_id == 2
-    assert retrieved_booking.booking_date == date(2024, 11, 12) 
+    assert retrieved_booking.start_date == date(2024, 11, 12) 
+    assert retrieved_booking.end_date == date(2024, 12, 12) 
 
 
 def test_remove_booking(setup_booking_repo):
     repo = setup_booking_repo
-    booking = Booking(None, 1, 2, "2024-11-12")
+    booking = Booking(None, 1, 2, "2024-11-12", "2024-11-14")
     booking_id = repo.add_booking(booking)
     
     repo.remove_booking(booking_id)
