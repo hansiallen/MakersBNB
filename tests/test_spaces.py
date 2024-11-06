@@ -11,7 +11,7 @@ def test_create_space():
     # Create a new unique space
     space =Space(
         id = 1,
-        user_id = 1,
+        owner_id = 1,
         name = "Cute cottage",
         description = "A small, cute cottage in the woods",
         price_per_night = 50.0
@@ -19,7 +19,7 @@ def test_create_space():
     
     # Assertions
     assert space.id == 1
-    assert space.user_id == 1
+    assert space.owner_id == 1
     assert space.name == "Cute cottage"
     assert space.description == "A small, cute cottage in the woods"
     assert space.price_per_night == 50.0
@@ -29,14 +29,14 @@ def test_create_multiple_spaces():
     # Create multiple spaces
     space1 = Space(
         id = 1,
-        user_id = 1,
+        owner_id = 1,
         name = "Cute cottage",
         description = "A small, cute cottage in the woods",
         price_per_night = 50.0
     )
     space2 = Space(
         id = 2,
-        user_id = 2 ,
+        owner_id = 2 ,
         name = "Beach House",
         description = "A beautiful beach house with ocean view",
         price_per_night = 200.0

@@ -1,38 +1,24 @@
 from lib.spaces import Space
-
 class SpacesRepo:
-    def __init__(self):
-        self.spaces = {}
-
+    def __init__(self,con):
+        self.db_connection = con
         self.next_id = 1
     
+
     def add_space(self, space):
-        self.spaces[space.id] = space
-        
+        self.db_connection.execute('INSERT INTO spaces (owner_id, name, description, price_per_night) values (%s, %s, %s, %s)',[space.owner_id,space.name, space.description, space.price_per_night])
 
     def remove_space(self, space_id):
-        if space_id in self.spaces:
-          del self.spaces[space_id]
+        if self.db_connection.execute("DELETE FROM spaces WHERE space_id = %s",[space_id]):
           return True
         return False
 
     def get_space(self, space_id):
-        return self.spaces.get(space_id)
+        item = self.db_connection.execute("SELECT * FROM spaces WHERE space_id = %s",[space_id])
+        if item == []: return None
+        item = item[0]
+        result =  Space(item["space_id"], item["owner_id"], item["name"], item['description'], item['price_per_night'])
+        return result
     
     def list_spaces(self):
-        return list(self.spaces.values())
-
-    def find_available_spaces(self, start_date, end_date):
-        available_spaces = []
-        for space in self.spaces.values():
-            if space.is_available(start_date, end_date):
-                available_spaces.append(space)
-        return available_spaces
-
-    def book_space(self, space_id, start_date, end_date):
-        space = self.get_space(space_id)
-        if space and space.is_available(start_date, end_date):
-            space.book(start_date, end_date)
-            return True
-        return False
-    
+        return list(self.db_connection.execute("SELECT * FROM spaces"))

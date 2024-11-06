@@ -3,9 +3,12 @@ from lib.spaces import Space
 from lib.spaces_repo import SpacesRepo
 
 @pytest.fixture
-def setup_spaces_repo():
+def setup_spaces_repo(db_connection):
     # Set up a new SpacesRepo instance before each test
-    repo = SpacesRepo()
+    repo = SpacesRepo(db_connection)
+    db_connection.seed("seeds/users.sql")
+    db_connection.seed("seeds/spaces.sql")
+    db_connection.execute('DELETE FROM spaces')
     yield repo
     # Clean up if needed after each test
 
@@ -17,8 +20,8 @@ def test_create_and_retrieve_space(setup_spaces_repo):
     repo.add_space(space)
     
     # Retrieve the space by ID
-    retrieved_space = repo.get_space(1)
-    
+    retrieved_space = repo.get_space(4)
+    print(retrieved_space)
     # Assertions to ensure the space was added and retrieved correctly
     assert retrieved_space is not None
     assert retrieved_space.name == "London flat"
@@ -51,7 +54,7 @@ def test_create_multiple_spaces(setup_spaces_repo):
     repo.add_space(
         Space(
         id = 1,
-        user_id=1,
+        owner_id=1,
         name="Beach House",
         description="A beautiful house by the beach",
         price_per_night=120.0
@@ -60,7 +63,7 @@ def test_create_multiple_spaces(setup_spaces_repo):
     repo.add_space(
         Space(
         id = 2,
-        user_id=2,
+        owner_id=2,
         name="Country House",
         description="A peaceful house in the countryside",
         price_per_night=80.0
