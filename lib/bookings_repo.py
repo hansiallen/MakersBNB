@@ -1,32 +1,35 @@
+# lib/booking_repo.py
+
+from lib.database_connection import DatabaseConnection
 from lib.bookings import Booking
 
-class BookingsRepo:
-    def __init__(self):
-        self.bookings = {} 
+class BookingRepo:
+    def __init__(self, db_connection: DatabaseConnection):
+        self.db_connection = db_connection
+    
+    def add_booking(self, booking: Booking):
+        query = """
+        INSERT INTO bookings (space_id, user_id, booking_date)
+        VALUES (%s, %s, %s)
+        RETURNING booking_id;
+        """
+        result = self.db_connection.execute(query, [booking.space_id, booking.user_id, booking.booking_date])
+        booking.booking_id = result[0]['booking_id']
+        return booking
 
-    def create_booking(self, id, user_id, space_id, start_date, end_date, status="pending"):
-        if id in self.bookings:
-            raise ValueError("Booking ID already exists")
-        
-        new_booking = Booking(id, user_id, space_id, start_date, end_date, status)
-        self.bookings[id] = new_booking
-        return new_booking
-
-    def get_booking(self, booking_id):
-        return self.bookings.get(booking_id)
-
-    def get_bookings_by_space(self, space_id):
-        return [booking for booking in self.bookings.values() if booking.space_id == space_id]
-
-    def update_booking_status(self, booking_id, new_status):
-        if booking_id not in self.bookings:
-            raise ValueError("Booking not found")
-        
-        self.bookings[booking_id].status = new_status
-        return self.bookings[booking_id]
-
-    def remove_booking(self, booking_id):
-        if booking_id in self.bookings:
-            del self.bookings[booking_id]
-            return True
-        return False
+    def get_booking(self, booking_id: int):
+        query = "SELECT * FROM bookings WHERE booking_id = %s;"
+        result = self.db_connection.execute(query, [booking_id])
+        if result:
+            return Booking(result[0]['booking_id'], result[0]['space_id'], result[0]['user_id'], result[0]['booking_date'])
+        return None
+    
+    def list_bookings(self):
+        query = "SELECT * FROM bookings;"
+        results = self.db_connection.execute(query)
+        return [Booking(row['booking_id'], row['space_id'], row['user_id'], row['booking_date']) for row in results]
+    
+    def remove_booking(self, booking_id: int):
+        query = "DELETE FROM bookings WHERE booking_id = %s;"
+        result = self.db_connection.execute(query, [booking_id])
+        return result > 0
