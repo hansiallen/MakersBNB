@@ -1,10 +1,17 @@
 <nav>
     <a href="/"><img src="/static/nav-icon.png" alt="" class="nav-icon"></a>
-    <div class="right-nav-area">
-        {% if logged_in %}
-        <p><a href="/about">About</a> | <a href="/Requests/">Requests</a> | <a href="/Sign out/">Sign out</a></p>
+    <div class="right-nav-area"> 
+        <p>
+        {% if is_about %}
+        <a href="/">home</a>
         {% else %}
-        <p><a href="/about">About</a> | <a href="/login/">login</a></p>
+        <a href="/about">About</a>
         {% endif %}
+        {% if logged_in %}
+        | <a href="/Requests/">Requests</a> | <a href="/Sign out/">Sign out</a>
+        {% else %}
+        | <a href="/login/">login</a>
+        {% endif %}
+    </p>
     </div>
 </nav>
