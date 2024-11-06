@@ -9,3 +9,20 @@ body {
 .nav-icon {
     width: 48px;
 }
+
+.two-col-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    margin: 20px 0px;
+}
+
+.responsive-card-grid {
+    display: grid;
+    grid-template-columns: repeat(autofill, minmax(200px, 1fr));
+}
+
+.listing-card {
+    border: 1px solid grey;
+    padding: 10px;
+}
