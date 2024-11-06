@@ -7,15 +7,22 @@
     <br>
     <h2>Filter by availability on date:</h2>
     <form action="./" method="get">
-        <label for="available-from">Available from (DD/MM/YY)</label>
-        <input type="date" name="available-from" id="available-from">
-        <label for="available-to">Available to (DD/MM/YY)</label>
-        <input type="date" name="available-to" id="available-to">
+        <div class="two-col-grid">
+            <div>
+                <label for="available-from">Available from (DD/MM/YY)</label>
+                <input type="date" name="available-from" id="available-from">
+            </div>
+            <div>
+                <label for="available-to">Available to (DD/MM/YY)</label>
+                <input type="date" name="available-to" id="available-to">
+            </div>
+        </div>
+        <button type="submit">Filter for availability</button>
     </form>
     <h2>Available Spaces</h2>
-    <div class="spaces-grid">
+    <div class="responsive-card-grid">
     {% for space in spaces %}
-    <div class="spaces-card">
+    <div class="listing-card">
     <h3>{{ space.name }}</h3>
     <p>{{ space.description }}</p>
     <p>Price: £{{ space.price }}</p>

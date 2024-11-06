@@ -1,63 +1,90 @@
-import pytest
 from lib.user_repo import UserRepo
+from unittest.mock import Mock
+from lib.user import User
 
+def test_add_user(db_connection):
+    """Test adding a new user"""
+    # Seed the database with the users.sql data
+    db_connection.seed("seeds/users.sql")
+    
+    # Initialize UserRepo with the database connection
+    user_repo = UserRepo(db_connection)
+    
+    # Create a new user without setting the id (it will be auto-generated)
+    user = User(
+        id = None,
+        email='user4@example.com',
+        password='password1',
+    )
+    
+    # Add the user to the database
+    user_id = user_repo.add_user(user)
+    
+    # Assertions
+    assert user_id is not None  # Check that the user ID is returned
 
-@pytest.fixture
-def user_repo():
-    return UserRepo()
+def test_remove_user(db_connection):
+    """Test removing a user"""
+    # Seed the database with the users.sql data
+    db_connection.seed("seeds/users.sql")
+    
+    # Initialize UserRepo with the actual database connection
+    user_repo = UserRepo(db_connection)
+    
+    # Create a new user (without setting the id, it will be auto-generated)
+    user = User(
+        id = 1,  # ID will be auto-generated
+        email="user4@example.com",
+        password="password1"
+    )
+    
+    # Add the user to the database and get the auto-generated user_id
+    user_id = user_repo.add_user(user)
+    
+    # Assertions: Ensure the user ID is returned and is not None
+    assert user_id is not None, "User ID should not be None"
+    
+    # Check that the user exists in the database by querying with the generated ID
+    result = db_connection.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    assert len(result) == 1, f"User with ID {user_id} should exist in the database"
+    
+    # Now, call remove_user to delete the user with the generated user_id
+    result = user_repo.remove_user(user_id)
+    
+    # Final check: Ensure the user no longer exists in the database
+    result = db_connection.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    assert len(result) == 0, f"User with ID {user_id} should have been deleted"
 
-def test_create_user(user_repo):
-    user = user_repo.add_user(1, "Adam", "adam@gmail.com", "password123")
-    assert user['id'] == 1  # Check that the user ID is 1
-    assert user['name'] == "Adam"
-    assert user['email'] == "adam@gmail.com"
-    assert user['password'] == "password123"
+def test_get_user(db_connection):
+    """Test getting a user"""
+    db_connection.seed("seeds/users.sql")
 
-def test_get_user(user_repo):
-    user_repo.add_user(1, "Adam", "adam@gmail.com", "password123")
+    # Initialize UserRepo with the connection
+    user_repo = UserRepo(db_connection)
+
+    # Call get_user to fetch user with ID 1
     user = user_repo.get_user(1)
-    assert user['name'] == "Adam"
 
-def test_user_exists(user_repo):
-    user_repo.add_user(1, "Adam", "adam@gmail.com", "password123")
-    assert user_repo.user_exists("adam@gmail.com") is True
-    assert user_repo.user_exists("nonexistent@gmail.com") is False
+    # Assertions to verify that the returned user matches the expected data
+    assert user.id == 1
+    assert user.email == 'user1@example.com'
+    assert user.password == 'password1'
 
-def test_get_all_users(user_repo):
-    # Add users with unique IDs
-    user_repo.add_user(1, "Adam", "adam@gmail.com", "password123")
-    user_repo.add_user(2, "Tobi", "tobi@gmail.com", "password456")
-    
-    # Retrieve all users and verify
-    all_users = user_repo.get_all_users()
+def test_get_multiple_users(db_connection):
+    """Test getting multiple users"""
+    db_connection.seed("seeds/users.sql")
 
-    # Assertions
-    assert len(all_users) == 2  # Ensure two users were created
+    # Initialize UserRepo with the connection
+    user_repo = UserRepo(db_connection)
 
-    # Verify user details
-    user_dict = {user['id']: user for user in all_users}
-    
-    assert user_dict[1] == {'id': 1, 'name': "Adam", 'email': "adam@gmail.com", 'password': "password123"}
-    assert user_dict[2] == {'id': 2, 'name': "Tobi", 'email': "tobi@gmail.com", 'password': "password456"}
-
-def test_remove_existing_user(user_repo):
-    # Create a user
-    user = user_repo.add_user(1, "Adam", "adam@gmail.com", "password123")
-    
-    # Verify user creation
-    assert user_repo.get_user(user['id']) == user  # Check if the user exists before removal.
-
-    # Now, remove the user
-    result = user_repo.remove_user(user['id'])  # Remove the user using the created user's ID.
+    # Retrieve all users
+    users = user_repo.list_users()
 
     # Assertions
-    assert result is True  # The result should indicate success
-    assert user_repo.get_user(user['id']) is None  # User should no longer exist
-
-
-def test_remove_nonexistent_user(user_repo):
-    # Attempt to remove a user that does not exist
-    result = user_repo.remove_user(999)  # ID 999 does not exist
-
-    # Assertions
-    assert result is False  # The result should indicate failure
+    assert len(users) == 3
+    assert users[0].email == 'user1@example.com'
+    assert users[0].password == 'password1'
+    assert users[1].email == 'user2@example.com'
+    assert users[1].password == 'password2'
+    assert users[2].email == 'user3@example.com'
+    assert users[2].password == 'password3'

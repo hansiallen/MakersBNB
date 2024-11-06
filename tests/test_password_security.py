@@ -1,5 +1,5 @@
 import pytest
-from utils.password_security import hash_password, verify_password
+from lib.utils.password_security import hash_password, verify_password
 
 def test_hash_password_returns_salt_and_hash():
     password = "test_password"
