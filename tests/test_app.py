@@ -23,9 +23,9 @@ def test_get_list_spaces_page(page, test_web_address,db_connection):
     db_connection.seed("seeds/spaces.sql")
     # We load a virtual browser and navigate to the /index page
     page.goto(f"http://{test_web_address}/")
-    page.screenshot(path= 'screenshot.png')
+    page.screenshot(path= 'screenshot.png', full_page=True)
     # We look at the a specific class tag
-    p_tag = page.get_by_role("listing-card").count()
+    p_tag = page.locator('[class="listing-card"]').count()
 
     # We assert that it has the text "This is the homepage."
     assert p_tag ==3
