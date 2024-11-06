@@ -1,16 +1,10 @@
 <nav>
-    <img src="/static/img/android-icon-192x192.png" alt="" class="nav-icon">
+    <a href="/"><img src="/static/nav-icon.png" alt="" class="nav-icon"></a>
     <div class="right-nav-area">
         {% if logged_in %}
-        <p><a href="/Spaces/">About</a></p>
-        <p>|</p>
-        <p><a href="/Requests/">Requests</a></p>
-        <p>|</p>
-        <p><a href="/Sign out/">Sign out</a></p>
+        <p><a href="/Spaces/">About</a> | <a href="/Requests/">Requests</a> | <a href="/Sign out/">Sign out</a></p>
         {% else %}
-        <p><a href="/about/">About</a></p>
-        <p>|</p>
-        <p><a href="/login/">login</a></p>
+        <p><a href="/about/">About</a> | <a href="/login/">login</a></p>
         {% endif %}
     </div>
 </nav>

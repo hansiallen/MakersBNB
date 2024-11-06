@@ -36,12 +36,6 @@ class DatabaseConnection:
                 self.connection = psycopg.connect(
                     f"postgresql://{render_username}:{render_password}@{render_int_db_url}:5432/{render_prod_db_name}",
                     row_factory=dict_row)
-            # Check if env variable 'alexandre' is set to 'true'
-            elif os.getenv('alexandre') == 'true':
-                print("Running on Alexandre's machine.")
-                self.connection = psycopg.connect(
-                    f"postgresql://localhost:5432/{self._database_name()}",
-                    row_factory=dict_row)
             else:
                 # Default case if none of the above conditions match
                 print("Running in the default local test environment.")
