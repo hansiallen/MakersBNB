@@ -68,7 +68,7 @@ def test_add_space(db_connection):
     spaces_repo = SpacesRepo(db_connection)
     db_connection.execute('Delete FROM spaces')
     space = Mock()
-    space.id = 5
+    space.id =  None
     space.owner_id= 1
     space.price_per_night= 150.00
     space.space_id= 2,
@@ -83,7 +83,7 @@ def test_remove_space(db_connection):
     db_connection.execute('Delete FROM spaces')
     spaces_repo = SpacesRepo(db_connection)
     space = Mock()
-    space.id = 6
+    space.id =  None
     space.owner_id= 1
     space.price_per_night= 150.00
     space.space_id= 2,
@@ -95,17 +95,20 @@ def test_remove_space(db_connection):
 
 def test_get_space(db_connection):
     """Test getting space"""
+    db_connection.seed("seeds/users.sql")
+    db_connection.seed("seeds/spaces.sql")
+    db_connection.execute('Delete FROM spaces')
     spaces_repo = SpacesRepo(db_connection)
     space = Mock()
-    space.id = 1
+    space.id =  None
     space.owner_id= 1
     space.price_per_night= 150.00
     space.space_id= 2,
     space.name= 'Urban Loft'
     space.description = ''
     spaces_repo.add_space(space)
-    retrieved_space = spaces_repo.get_space(1)
-    assert retrieved_space.id == space.id
+    retrieved_space = spaces_repo.get_space(4)
+    assert retrieved_space.name == space.name
 
 def test_get_multiple_spaces(db_connection):
     db_connection.seed("seeds/users.sql")
@@ -114,7 +117,7 @@ def test_get_multiple_spaces(db_connection):
     """Test getting space"""
     spaces_repo = SpacesRepo(db_connection)
     space1 = Mock()
-    space1.id = 1
+    space1.id =  None
     space1.owner_id= 1
     space1.price_per_night= 150.00
     space1.space_id= 2,
@@ -122,7 +125,7 @@ def test_get_multiple_spaces(db_connection):
     space1.description = ''
     spaces_repo.add_space(space1)
     space2 = Mock()
-    space2.id = 2
+    space2.id = None
     space2.owner_id= 1
     space2.price_per_night= 150.00
     space2.space_id= 2,
@@ -130,7 +133,7 @@ def test_get_multiple_spaces(db_connection):
     space2.description = ''
     spaces_repo.add_space(space2)
     space3 = Mock()
-    space3.id = 3
+    space3.id = None
     space3.owner_id= 1
     space3.price_per_night= 150.00
     space3.space_id= 2,

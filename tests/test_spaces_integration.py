@@ -14,7 +14,7 @@ def setup_spaces_repo(db_connection):
 
 def test_create_and_retrieve_space(setup_spaces_repo):
     repo = setup_spaces_repo
-    space = Space(1, 1, "London flat", "A small flat in the city", 50.0)
+    space = Space(None, 1, "London flat", "A small flat in the city", 50.0)
     
     # Add the space to the repository
     repo.add_space(space)
@@ -29,7 +29,7 @@ def test_create_and_retrieve_space(setup_spaces_repo):
 
 def test_remove_space(setup_spaces_repo):
     repo = setup_spaces_repo
-    space = Space(1, 1, "London flat", "A small flat in the city", 50.0)
+    space = Space(None, 1, "London flat", "A small flat in the city", 50.0)
     repo.add_space(space)
 
     # Now remove the space
@@ -53,7 +53,7 @@ def test_create_multiple_spaces(setup_spaces_repo):
     # Create multiple spaces
     repo.add_space(
         Space(
-        id = 1,
+        id =  None,
         owner_id=1,
         name="Beach House",
         description="A beautiful house by the beach",
@@ -62,7 +62,7 @@ def test_create_multiple_spaces(setup_spaces_repo):
     
     repo.add_space(
         Space(
-        id = 2,
+        id =  None,
         owner_id=2,
         name="Country House",
         description="A peaceful house in the countryside",
@@ -77,7 +77,7 @@ def test_create_multiple_spaces(setup_spaces_repo):
 
 def test_space_validation():
     # Create a valid space
-    space = Space(1, 1, "Luxury Villa", "A luxurious villa with a pool", 200)
+    space = Space(None, 1, "Luxury Villa", "A luxurious villa with a pool", 200)
     
     # Assertions to ensure the space is created properly
     assert space.name == "Luxury Villa"
