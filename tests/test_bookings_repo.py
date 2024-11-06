@@ -2,41 +2,48 @@ from lib.bookings_repo import BookingRepo
 from lib.bookings import Booking
 from mock import Mock
 
-def test_add_booking():
-    db_connection = Mock()
-    repo = BookingRepo(db_connection)
+def test_add_booking(db_connection):
+    booking_repo = BookingRepo(db_connection)
+    db_connection.execute("DELETE FROM bookings")
+    
+    booking = Mock()
+    booking.booking_id = None
+    booking.space_id = 1
+    booking.user_id = 2
+    booking.booking_date = "2024-11-12"
+    
+    booking_id = booking_repo.add_booking(booking)
+    assert booking_id is not None
 
-    # Mock the database response for INSERT query
-    db_connection.execute.return_value = [{'booking_id': 1}]
+def test_remove_booking(db_connection):
+    booking_repo = BookingRepo(db_connection)
+    db_connection.execute("DELETE FROM bookings")
+    
+    # Add and then remove booking
+    booking = Booking(None, 1, 2, "2024-11-12")
+    booking_id = booking_repo.add_booking(booking)
+    assert booking_repo.remove_booking(booking_id) == True
+    assert booking_repo.get_booking(booking_id) is None
 
-    booking = Booking(None, 1, 1, "2024-11-10")
-    added_booking = repo.add_booking(booking)
+def test_get_booking(db_connection):
+    booking_repo = BookingRepo(db_connection)
+    db_connection.execute("DELETE FROM bookings")
+    
+    # Add booking and retrieve it
+    booking = Booking(None, 1, 2, "2024-11-12")
+    booking_id = booking_repo.add_booking(booking)
+    retrieved_booking = booking_repo.get_booking(booking_id)
+    
+    assert retrieved_booking is not None
+    assert retrieved_booking.space_id == 1
+    assert retrieved_booking.user_id == 2
 
-    assert added_booking.booking_id == 1
-    assert added_booking.space_id == 1
-    assert added_booking.user_id == 1
-    assert added_booking.booking_date == "2024-11-10"
-
-def test_get_booking():
-    db_connection = Mock()
-    repo = BookingRepo(db_connection)
-
-    # Mock the database response for SELECT query
-    db_connection.execute.return_value = [{'booking_id': 1, 'space_id': 1, 'user_id': 1, 'booking_date': '2024-11-10'}]
-
-    booking = repo.get_booking(1)
-    assert booking is not None
-    assert booking.booking_id == 1
-    assert booking.space_id == 1
-    assert booking.user_id == 1
-    assert booking.booking_date == "2024-11-10"
-
-def test_get_booking_not_found():
-    db_connection = Mock()
-    repo = BookingRepo(db_connection)
-
-    # Mock the database response for a missing booking
-    db_connection.execute.return_value = []
-
-    booking = repo.get_booking(999)
-    assert booking is None
+def test_list_bookings(db_connection):
+    booking_repo = BookingRepo(db_connection)
+    db_connection.execute("DELETE FROM bookings")
+    
+    booking_repo.add_booking(Booking(None, 1, 2, "2024-11-12"))
+    booking_repo.add_booking(Booking(None, 1, 3, "2024-11-13"))
+    all_bookings = booking_repo.list_bookings()
+    
+    assert len(all_bookings) == 2
