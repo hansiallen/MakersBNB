@@ -48,3 +48,21 @@ def test_infro_from_get_list_spaces_page(page, test_web_address,db_connection):
     assert p_tag != None
 
     # We assert that it has the text "This is the homepage."
+
+def test_infro_from_get_list_spaces_page(page, test_web_address,db_connection):
+    db_connection.seed("seeds/users.sql")
+    db_connection.seed("seeds/spaces.sql")
+    # We load a virtual browser and navigate to the /index page
+    page.goto(f"http://{test_web_address}/space/1")
+    # page.screenshot(path= 'screenshot.png', full_page=True)
+    # We look at the a specific class tag
+    p_tag = page.get_by_text('A relaxing beach house with ocean views')
+    assert p_tag != None
+    page.goto(f"http://{test_web_address}/space/2")
+    p_tag = page.get_by_text('A stylish loft in the city')
+    assert p_tag != None
+    page.goto(f"http://{test_web_address}/space/3")
+    p_tag = page.get_by_text('A relaxing beach house with ocean views')
+    assert p_tag != None
+
+    # We assert that it has the text "This is the homepage."
