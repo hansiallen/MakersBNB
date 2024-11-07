@@ -10,9 +10,10 @@ from flask_login import login_required, current_user, logout_user, login_user
 app = Flask(__name__)
 
 app.secret_key = "mysecretkey"
-users = {'email@test.com': generate_password_hash('password123')}
+users = {'foo@bar.com': generate_password_hash('secret')}
 
 login_manager.init_app(app)
+login_manager.login_view = 'get_login_route'
 
 # == Your Routes Here ==
 
@@ -61,16 +62,16 @@ def get_login_route():
         
         if email in users and check_password_hash(users[email], password):
             user = User(email)
-            login_user(user)
-
-            return redirect('/')
+            if user.verify_password(password):
+                login_user(user)
+                return redirect('/')
         
         else:
             print("Invalid login attempt")
             error = 'Invalid email/password combination'
-            return render_template('login.html', error=error)
+            return render_template('pages/login.html', error=error)
     
-    return render_template('login.html')
+    return render_template('pages/login.html')
 
 @app.route('/logout')
 def logout():

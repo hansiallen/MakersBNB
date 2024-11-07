@@ -13,6 +13,9 @@ class User(UserMixin):
     def __init__(self, email=None):
         self.id = email  # Use email as the unique user ID
 
+    def get_id(self):
+        return self.id
+
     def verify_password(self, password):
         # Assuming you store a hashed password (as done with generate_password_hash)
         stored_password = users.get(self.id, {}).get('password')  # Fetch the stored hashed password
