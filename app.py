@@ -10,6 +10,8 @@ from flask_login import login_required, current_user, logout_user, login_user
 from lib.user_repo import UserRepo
 from lib.database_connection import DatabaseConnection
 
+    
+
 db_connection = DatabaseConnection()
 db_connection.connect() 
 user_repo = UserRepo(db_connection)  
@@ -28,7 +30,7 @@ login_manager.login_view = 'login'  # Redirect to the login route when needed
 @login_manager.user_loader
 def load_user(user_id):
     user_repo = UserRepo(db_connection)  # Assuming db_connection is initialized
-    return user_repo.get_user_by_id(user_id)
+    return user_repo.get_user_by_email(user_id)
 
 
 # == Your Routes Here ==
@@ -49,7 +51,9 @@ def get_index_route():
 def get_spaces_route():
     repo = SpacesRepo(get_flask_database_connection(app))
     spaces =repo.list_spaces()
-    return render_template('/pages/list-spaces.html', spaces =spaces)
+    if current_user.is_authenticated: loggedin = True
+    else: loggedin=False
+    return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= loggedin)
 
 
 @app.route('/add-spaces',methods=['POST'])
@@ -138,8 +142,8 @@ def protected():
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()  # Log the user out
     print(f'Logged out user {current_user.id}')  # Optional debug info
+    logout_user()  # Log the user out
     return redirect(url_for('get_spaces_route'))  # Redirect to spaces list after logout
 
 if __name__ == '__main__':

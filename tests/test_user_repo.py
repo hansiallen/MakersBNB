@@ -12,7 +12,7 @@ def test_add_user(db_connection):
     
     # Create a new user without setting the id (it will be auto-generated)
     user = User(
-        id = None,
+        user_id = None,
         email='user4@example.com',
         password='password1',
     )
@@ -33,7 +33,7 @@ def test_remove_user(db_connection):
     
     # Create a new user (without setting the id, it will be auto-generated)
     user = User(
-        id = 1,  # ID will be auto-generated
+        user_id = 1,  # ID will be auto-generated
         email="user4@example.com",
         password="password1"
     )
