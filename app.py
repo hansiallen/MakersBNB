@@ -7,6 +7,9 @@ from lib.spaces import Space
 # Create a new Flask app
 app = Flask(__name__)
 
+app.secret_key = "mysecretkey"
+users = {'email@test.com': generate_password_hash('password123')}
+
 # == Your Routes Here ==
 
 # GET /index
@@ -26,7 +29,7 @@ def get_index_route():
 def get_spaces_route():
     repo = SpacesRepo(get_flask_database_connection(app))
     spaces =repo.list_spaces()
-    return render_template('/pages/list-spaces.html', spaces =spaces)
+    return render_template('pages/list-spaces.html', spaces=spaces)
 
 
 @app.route('/add-spaces',methods=['POST'])
@@ -38,25 +41,51 @@ def add_spaces_route():
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
     # have an argument with the space id to show the correct space
-    return render_template('/pages/space.html')
+    return render_template('pages/space.html')
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def get_login_route():
-    # should return a full login page
-    return render_template('login.html')
+    if 'email' in session:
+        print("User already logged in")
+        return redirect('/')
+    
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
 
-@app.route('/login', methods=['POST'])
-def try_login_route():
-    # takes email and password from a form
-    # should give a return message as a either
-    #  'sucseffuly logged in' or 'incorrect email or password'
-    pass
+        print(f"Login attempt with email: {email}")
+        
+        if email in users and check_password_hash(users[email], password):
+            print("Login successful")
+            session['email'] = email
+            return redirect('/')
+        else:
+            print("Invalid login attempt")
+            error = 'Invalid email/password combination'
+            return render_template('login.html', error=error)
+    
+    return render_template('login.html')
+    
+
+@app.route('/home')
+def home():
+    if 'email' in session:
+        return render_template('pages/list-spaces.html', email=session['email'])
+    else:
+        return redirect('/login')
+    
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    return redirect('/login')
+
+
 
 
 @app.route('/sign-up', methods=['GET'])
 def get_sign_up_route():
     # should return a full login page
-    return render_template('/pages/sign-up.html')
+    return render_template('pages/sign-up.html')
 
 
 
