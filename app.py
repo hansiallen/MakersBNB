@@ -45,9 +45,7 @@ def get_index_route():
 def get_spaces_route():
     repo = SpacesRepo(get_flask_database_connection(app))
     spaces =repo.list_spaces()
-    if current_user.is_authenticated: loggedin = True
-    else: loggedin=False
-    return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= loggedin)
+    return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= current_user.is_authenticated)
 
 
 @app.route('/add-spaces',methods=['POST'])
