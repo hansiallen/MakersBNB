@@ -51,8 +51,8 @@ def get_space_info_route(id):
 @app.route('/login', methods=['GET', 'POST'])
 def get_login_route():
     if current_user.is_authenticated:
-        print("User already logged in")
-        return redirect('/')
+        return redirect(url_for('protected'))
+    
     
     if request.method == 'POST':
         email = request.form['email']
@@ -62,23 +62,30 @@ def get_login_route():
         
         if email in users and check_password_hash(users[email], password):
             user = User(email)
-            if user.verify_password(password):
-                login_user(user)
-                return redirect('/')
+            login_user(user)
+            print(f"User {email} logged in successfully")
+            return redirect(url_for('protected'))
         
         else:
             print("Invalid login attempt")
-            error = 'Invalid email/password combination'
+            error = 'Invalid credentials'
             return render_template('pages/login.html', error=error)
     
     return render_template('pages/login.html')
+
+@app.route('/protected', methods=['GET', 'POST'])
+@login_required
+def protected():
+    repo = SpacesRepo(get_flask_database_connection(app))
+    spaces =repo.list_spaces()
+    return render_template('pages/list-spaces.html', spaces=spaces)
 
 @app.route('/logout')
 def logout():
     # Log the user out
     logout_user()
     # Redirect to the list of spaces page (or homepage)
-    return redirect(url_for('get_spaces_route'))  # Redirect to the route that renders the list of spaces
+    return redirect('/')  # Redirect to the route that renders the list of spaces
 
     
 
@@ -118,8 +125,11 @@ def render_privacy_policy():
 def render_tos_page():
     return render_template('pages/tos.html')
 
+
 def load_user(user_id):
     return User(user_id)
+
+
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
@@ -129,8 +139,4 @@ if __name__ == '__main__':
 
 # Routes
 
-@app.route('/protected')
-@login_required
-def protected():
-    return f'Logged in as: {current_user.id}'
 

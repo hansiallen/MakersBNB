@@ -55,6 +55,10 @@ def test_logout(client):
     # Assert that the redirect location is the get spaces page (or homepage)
     assert response.headers['Location'] == '/'  # This matches the redirect to the get spaces page
 
+    client.cookie_jar.clear()
+
+    assert not current_user.is_authenticated  
+
     # Try accessing a protected route again after logout
     protected_response = client.get('/protected')
 
