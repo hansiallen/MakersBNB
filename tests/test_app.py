@@ -49,7 +49,7 @@ def test_infro_from_get_list_spaces_page(page, test_web_address,db_connection):
 
     # We assert that it has the text "This is the homepage."
 
-def test_infro_from_get_list_spaces_page(page, test_web_address,db_connection):
+def test_infro_from_get_list_spaces_pages(page, test_web_address,db_connection):
     db_connection.seed("seeds/users.sql")
     db_connection.seed("seeds/spaces.sql")
     # We load a virtual browser and navigate to the /index page
@@ -65,4 +65,3 @@ def test_infro_from_get_list_spaces_page(page, test_web_address,db_connection):
     p_tag = page.get_by_text('A relaxing beach house with ocean views')
     assert p_tag != None
 
-    # We assert that it has the text "This is the homepage."
