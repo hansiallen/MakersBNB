@@ -4,9 +4,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from lib.database_connection import get_flask_database_connection
 from lib.spaces_repo import SpacesRepo
 from lib.spaces import Space
+from lib.auth import login_manager, User, LoginManager
+from flask_login import login_required, current_user, logout_user, login_user
 # Create a new Flask app
 app = Flask(__name__)
 
+# Secret key for session management (required by Flask-Login)
+app.secret_key = 'your_secret_key'  # Change this to a secure key
+
+# Initialize the login manager with the Flask app
+
+login_manager.init_app(app)
+login_manager.login_view = "login"  # Redirect to the login route when needed
 
 
 # == Your Routes Here ==
@@ -45,7 +54,7 @@ def get_space_info_route(id):
 app.route('/login', methods=['GET'])
 def get_login_route():
     # should return a full login page
-    return render_template('login.html')
+    return render_template('/pages/login.html')
 
 app.route('/login', methods=['POST'])
 def try_login_route():
@@ -87,14 +96,6 @@ def render_tos_page():
 if __name__ == '__main__':
     app.run(debug=True, port=int(os.environ.get('PORT', 5001)))
 
-app.secret_key = 'supersecretkey'  # This is used to secure sessions
-
-# Initialize login manager
-login_manager.init_app(app)
-
-# Mock database for simplicity
-users = {"foo@bar.com": {"password": "secret"}}  # Example user
-
 # Routes
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -103,17 +104,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        # Check if user exists and the password is correct
-        if email in users and users[email]['password'] == password:
-            user = User()
-            user.id = email
-            login_user(user)
-            return redirect(url_for('protected'))
+        # Load user and verify password
+        user = User(email)
+        if user.verify_password(password):  # You need to implement this method
+            login_user(user)  # Log the user in
+            return redirect(url_for('protected'))  # Redirect to a protected page
+        else:
+            return 'Invalid credentials', 401  # If credentials are incorrect
 
-        return 'Bad login'
-
-    # GET request: render the login page
-    return render_template('login.html')
+    return render_template('login.html')  # Render the login form on GET request
 
 @app.route('/protected')
 @login_required
@@ -122,9 +121,7 @@ def protected():
 
 @app.route('/logout')
 def logout():
+    # Log the user out
     logout_user()
-    return redirect(url_for('login'))
-
-# Run the app
-if __name__ == '__main__':
-    app.run(debug=True)
+    # Redirect to the list of spaces page (or homepage)
+    return redirect(url_for('get_spaces_route'))  # Redirect to the route that renders the list of spaces
