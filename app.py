@@ -80,7 +80,7 @@ def try_sign_up_route():
 
 @app.route('/about', methods=['GET'])
 def render_about_page():
-    return render_template('pages/about.html')
+    return render_template('pages/about.html', is_about= True)
 
 @app.route('/privacy', methods=['GET'])
 def render_privacy_policy():
