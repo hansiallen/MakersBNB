@@ -1,4 +1,6 @@
-class User:
+from flask_login import UserMixin
+
+class User(UserMixin):
 
     def __init__(self, id, email, password):
         if not email:
@@ -11,6 +13,15 @@ class User:
         return self.__dict__ == other.__dict__
     
     def __repr__(self):
-
         return f"User({self.id}, {self.email}, {self.password})"
+
+    def get_id(self):
+        return str(self.id)
+    
+    def verify_password(self, password):
+
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.password, password)
+
+        
     

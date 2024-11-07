@@ -12,6 +12,8 @@ app = Flask(__name__)
 app.secret_key = "mysecretkey"
 users = {'email@test.com': generate_password_hash('password123')}
 
+login_manager.init_app(app)
+
 # == Your Routes Here ==
 
 # GET /index
@@ -47,7 +49,7 @@ def get_space_info_route(id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def get_login_route():
-    if 'email' in session:
+    if current_user.is_authenticated:
         print("User already logged in")
         return redirect('/')
     
@@ -58,29 +60,34 @@ def get_login_route():
         print(f"Login attempt with email: {email}")
         
         if email in users and check_password_hash(users[email], password):
-            print("Login successful")
-            session['email'] = email
+            user = User(email)
+            login_user(user)
+
             return redirect('/')
+        
         else:
             print("Invalid login attempt")
             error = 'Invalid email/password combination'
             return render_template('login.html', error=error)
     
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    # Log the user out
+    logout_user()
+    # Redirect to the list of spaces page (or homepage)
+    return redirect(url_for('get_spaces_route'))  # Redirect to the route that renders the list of spaces
+
     
 
 @app.route('/home')
 def home():
-    if 'email' in session:
-        return render_template('pages/list-spaces.html', email=session['email'])
+    if current_user.is_authenticated:
+    
+        return render_template('pages/list-spaces.html', email=current_user.email)
     else:
         return redirect('/login')
-    
-@app.route('/logout')
-def logout():
-    session.pop('email', None)
-    return redirect('/login')
-
 
 
 
@@ -110,6 +117,9 @@ def render_privacy_policy():
 def render_tos_page():
     return render_template('pages/tos.html')
 
+def load_user(user_id):
+    return User(user_id)
+
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
 # if started in test mode.
@@ -118,30 +128,8 @@ if __name__ == '__main__':
 
 # Routes
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-
-        # Load user and verify password
-        user = User(email)
-        if user.verify_password(password):  # You need to implement this method
-            login_user(user)  # Log the user in
-            return redirect(url_for('protected'))  # Redirect to a protected page
-        else:
-            return 'Invalid credentials', 401  # If credentials are incorrect
-
-    return render_template('login.html')  # Render the login form on GET request
-
 @app.route('/protected')
 @login_required
 def protected():
     return f'Logged in as: {current_user.id}'
 
-@app.route('/logout')
-def logout():
-    # Log the user out
-    logout_user()
-    # Redirect to the list of spaces page (or homepage)
-    return redirect(url_for('get_spaces_route'))  # Redirect to the route that renders the list of spaces
