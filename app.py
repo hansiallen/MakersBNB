@@ -37,7 +37,7 @@ def add_spaces_route():
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
-    connnection = get_flask_database_connection()
+    connnection = get_flask_database_connection(app)
     spaces_repo = SpacesRepo(connnection)
     space = spaces_repo.get_space(id)
 
