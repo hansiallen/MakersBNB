@@ -106,7 +106,7 @@ def login():
         password = request.form['password']
         print(f'Attempting login with email: {email}')
         
-        user_repo = UserRepo(db_connection)
+        user_repo = UserRepo(get_flask_database_connection(app))
         user = user_repo.get_user_by_email(email)
         if user:
             print(f'User found: {user.email}')
@@ -115,6 +115,8 @@ def login():
                 login_user(user)
                 return redirect(url_for('protected'))  # Redirect to the protected page after successful login
             else:
+                print(user.password)
+                print(password)
                 print('Incorrect password')
                 flash('Incorrect password', 'error')
         else:

@@ -34,7 +34,7 @@ def test_login_valid_user(client):
     app.user_repo = mock_user_repo
 
     # Simulate logging in with valid credentials (mocking the POST request)
-    response = client.post('/login', data={'email': 'user1@example.com', 'password': generate_password_hash('password1')})
+    response = client.post('/login', data={'email': 'user1@example.com', 'password': 'password1'})
     
     # Assert the response is a redirect (status code 302)
     assert response.status_code == 302

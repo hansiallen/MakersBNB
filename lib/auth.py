@@ -2,6 +2,7 @@ from flask_login import LoginManager, UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from lib.user_repo import UserRepo
 from lib .database_connection import DatabaseConnection
+from lib.utils.password_security import *
 
 # Initialize the login manager
 login_manager = LoginManager()
@@ -26,10 +27,9 @@ class User(UserMixin):
         return self.active
 
     def verify_password(self, password):
+        hashed_data = hash_password(self.password)
         """Verify if the given password matches the stored hashed password."""
-        print (self.password, password)
-        print (check_password_hash(self.password, password))
-        return check_password_hash(self.password, password)  # Compare hashed passwords
+        return verify_password(password, hashed_data['salt'], hashed_data['hashed_password'])  # Compare hashed passwords
 
     def get_id(self):
         """Return the unique identifier for the user."""

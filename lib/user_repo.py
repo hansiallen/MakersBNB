@@ -32,6 +32,15 @@ class UserRepo:
             return User(user_data['user_id'], user_data['email'], user_data['password'])  # Remove user_data['name']
         return None
     
+    def get_user_by_id(self, user_id):
+        """Get a user from the database by ID."""
+        query = "SELECT user_id, email, password FROM users WHERE user_id = %s"
+        result = self.db_connection.execute(query, (user_id,))
+        if result:
+            user_data = result[0]
+            return User(user_data['user_id'], user_data['email'], user_data['password'])  # Remove user_data['name']
+        return None
+    
     def get_user_by_email(self, email):
         """Get a user from the database by email."""
         query = "SELECT user_id, email, password FROM users WHERE email = %s"
