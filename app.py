@@ -2,9 +2,17 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from lib.database_connection import get_flask_database_connection
+from flask import Flask, render_template, request, redirect, url_for
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from lib.auth import login_manager, User
+ 
+
+
 
 # Create a new Flask app
 app = Flask(__name__)
+
+
 
 # == Your Routes Here ==
 
@@ -37,12 +45,12 @@ def get_space_info_route(id):
     # have an argument with the space id to show the correct space
     return render_template('/pages/space.html')
 
-@app.route('/login', methods=['GET'])
+app.route('/login', methods=['GET'])
 def get_login_route():
     # should return a full login page
     return render_template('login.html')
 
-@app.route('/login', methods=['POST'])
+app.route('/login', methods=['POST'])
 def try_login_route():
     # takes email and password from a form
     # should give a return message as a either
@@ -69,3 +77,45 @@ def try_sign_up_route():
 # if started in test mode.
 if __name__ == '__main__':
     app.run(debug=True, port=int(os.environ.get('PORT', 5001)))
+
+app.secret_key = 'supersecretkey'  # This is used to secure sessions
+
+# Initialize login manager
+login_manager.init_app(app)
+
+# Mock database for simplicity
+users = {"foo@bar.com": {"password": "secret"}}  # Example user
+
+# Routes
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        # Check if user exists and the password is correct
+        if email in users and users[email]['password'] == password:
+            user = User()
+            user.id = email
+            login_user(user)
+            return redirect(url_for('protected'))
+
+        return 'Bad login'
+
+    # GET request: render the login page
+    return render_template('login.html')
+
+@app.route('/protected')
+@login_required
+def protected():
+    return f'Logged in as: {current_user.id}'
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# Run the app
+if __name__ == '__main__':
+    app.run(debug=True)
