@@ -6,6 +6,14 @@ from lib.spaces_repo import SpacesRepo
 from lib.spaces import Space
 from lib.auth import login_manager, User, LoginManager
 from flask_login import login_required, current_user, logout_user, login_user
+
+from lib.user_repo import UserRepo
+from lib.database_connection import DatabaseConnection
+
+db_connection = DatabaseConnection()
+db_connection.connect() 
+user_repo = UserRepo(db_connection)  
+
 # Create a new Flask app
 app = Flask(__name__)
 
@@ -15,7 +23,7 @@ app.secret_key = 'your_secret_key'  # Change this to a secure key
 # Initialize the login manager with the Flask app
 
 login_manager.init_app(app)
-login_manager.login_view = "login"  # Redirect to the login route when needed
+login_manager.login_view = 'login'  # Redirect to the login route when needed
 
 
 # == Your Routes Here ==
@@ -98,30 +106,30 @@ if __name__ == '__main__':
 
 # Routes
 
-@app.route('/login', methods=['GET', 'POST'])
+# Login route
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+    email = request.form['email']
+    password = request.form['password']
+    
+    user = user_repo.get_user_by_email(email)  # Fetch user from DB
+    if user and check_password_hash(user.password, password):
+        login_user(user)  # Log the user in using Flask-Login
+        return redirect('/protected')
+    
+    return "Invalid credentials", 401  # Or appropriate error handling
 
-        # Load user and verify password
-        user = User(email)
-        if user.verify_password(password):  # You need to implement this method
-            login_user(user)  # Log the user in
-            return redirect(url_for('protected'))  # Redirect to a protected page
-        else:
-            return 'Invalid credentials', 401  # If credentials are incorrect
-
-    return render_template('login.html')  # Render the login form on GET request
-
-@app.route('/protected')
+@app.route('/protected', methods=['GET'])  # Ensure GET is allowed
 @login_required
 def protected():
     return f'Logged in as: {current_user.id}'
 
+# Logout route
 @app.route('/logout')
+@login_required
 def logout():
-    # Log the user out
-    logout_user()
-    # Redirect to the list of spaces page (or homepage)
-    return redirect(url_for('get_spaces_route'))  # Redirect to the route that renders the list of spaces
+    logout_user()  # Log the user out
+    return redirect(url_for('get_spaces_route'))  # Redirect to another page (e.g., homepage or list of spaces)
+
+if __name__ == '__main__':
+    app.run(debug=True)
