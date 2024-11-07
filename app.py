@@ -64,8 +64,15 @@ def add_spaces_route():
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
-    # have an argument with the space id to show the correct space
-    return render_template('/pages/space.html')
+    connnection = get_flask_database_connection(app)
+    spaces_repo = SpacesRepo(connnection)
+    space = spaces_repo.get_space(id)
+
+    # Maybe create a 404.html for this kind of thing
+    if not space:
+        return "Couldn't find the space you're looking for", 404
+    
+    return render_template('pages/space.html', space=space)
 
 
 @app.route('/sign-up', methods=['GET','POST'])
