@@ -3,7 +3,6 @@ from pathlib import Path
 from xprocess import ProcessStarter
 from lib.database_connection import DatabaseConnection
 from app import app
-from lib.user_repo import UserRepo
 
 # This is a Pytest fixture.
 # It creates an object that we can use in our tests.
@@ -50,9 +49,3 @@ def web_client():
     app.config['TESTING'] = True # This gets us better errors
     with app.test_client() as client:
         yield client
-
-
-@pytest.fixture
-def user_repo(db_connection):
-    # Return an instance of UserRepo with a test database connection
-    return UserRepo(db_connection)
