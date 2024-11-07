@@ -4,11 +4,11 @@ class UserRepo:
     def __init__(self, db_connection):
         self.db_connection = db_connection  # Expecting a database connection object
 
-    def add_user(self, user: User):
+    def add_user(self, user):
         """Add a user to the database."""
         # Insert email and password only, ignoring the name field
         query = "INSERT INTO users (email, password) VALUES (%s, %s) RETURNING user_id"
-        result = self.db_connection.execute(query, (user.email, user.password))
+        result = self.db_connection.execute(query, (user.email, user.password, ))
     
         if result:
             return result[0]['user_id']
