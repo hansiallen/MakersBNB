@@ -3,14 +3,14 @@
     <div class="right-nav-area"> 
         <p>
         {% if is_about %}
-        <a href="/">Home</a>
+        <a href="/">home</a>
         {% else %}
         <a href="/about">About</a>
         {% endif %}
         {% if logged_in %}
-        | <a href="/Requests/">Requests</a> | <a href="/Sign out/">Sign out</a>
+        | <a href="/Requests">Requests</a> | <a href="/logout">logout</a>
         {% else %}
-        | <a href="/login/">login</a>
+        | <a href="/login">login</a>
         {% endif %}
     </p>
     </div>
