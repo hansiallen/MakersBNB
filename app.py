@@ -6,13 +6,13 @@ from lib.spaces_repo import SpacesRepo
 from lib.spaces import Space
 from flask_login import login_required, current_user, logout_user, login_user
 from lib.user_repo import UserRepo, User
+from lib.auth import login_manager, LoginManager
 
     
 
 # Create a new Flask app
 app = Flask(__name__)
 
-from lib.auth import login_manager, LoginManager
 # Secret key for session management (required by Flask-Login)
 app.secret_key = 'your_secret_key'  # Change this to a secure key
 
@@ -23,7 +23,7 @@ login_manager.login_view = 'login'  # Redirect to the login route when needed
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_repo = UserRepo(get_flask_database_connection(app))  # Assuming get_flask_database_connection(app) is initialized
+    user_repo = UserRepo(get_flask_database_connection(app))  # Assuming db_connection is initialized
     return user_repo.get_user_by_email(user_id)
 
 
@@ -58,8 +58,7 @@ def add_spaces_route():
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
-    connnection = get_flask_database_connection(app)
-    spaces_repo = SpacesRepo(connnection)
+    spaces_repo = SpacesRepo(get_flask_database_connection(app))
     space = spaces_repo.get_space(id)
 
     # Maybe create a 404.html for this kind of thing

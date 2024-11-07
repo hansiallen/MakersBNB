@@ -15,7 +15,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-def test_login_valid_user(client):
+def test_login_valid_user(client, db_connection):
     """Test logging in with valid credentials using mock data (no real database needed)"""
     
     # Mock user data
