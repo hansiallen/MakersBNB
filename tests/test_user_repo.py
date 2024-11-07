@@ -88,4 +88,3 @@ def test_get_multiple_users(db_connection):
     assert users[1].password == 'password2'
     assert users[2].email == 'user3@example.com'
     assert users[2].password == 'password3'
-    

@@ -39,8 +39,3 @@ class UserRepo:
         
         # Now we expect to return a list of users with only email and password (no name)
         return [User(row['user_id'], row['email'], row['password']) for row in result]
-
-    
-
-
-

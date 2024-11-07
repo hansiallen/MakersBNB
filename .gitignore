@@ -1,8 +1,9 @@
+.DS_Store
 __pycache__
 .vscode
 .pytest_cache
 screenshot.png
 .Venv
 makersbnb-venv
-*time_chamber*
-.DS_Store
+time_chamber
+screenshot.png
