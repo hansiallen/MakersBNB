@@ -18,10 +18,10 @@ def client():
 def test_login_valid_user(client):
     """Test logging in with valid credentials using mock data (no real database needed)"""
     
-    # Mock user data
+    # Mock user data (hashed password)
     mock_user_data = {
         'email': 'user1@example.com',
-        'password': generate_password_hash('password1')
+        'password': generate_password_hash('password1')  # This is the correct hashed password
     }
     
     # Create a mock UserRepo to simulate database interaction
@@ -33,8 +33,8 @@ def test_login_valid_user(client):
     # Patch the app's user repo to use the mock
     app.user_repo = mock_user_repo
 
-    # Simulate logging in with valid credentials (mocking the POST request)
-    response = client.post('/login', data={'email': 'user1@example.com', 'password': generate_password_hash('password1')})
+    # Simulate logging in with plain text credentials (submit the plain text password)
+    response = client.post('/login', data={'email': 'user1@example.com', 'password': 'password1'})
     
     # Assert the response is a redirect (status code 302)
     assert response.status_code == 302
@@ -46,8 +46,7 @@ def test_login_valid_user(client):
     with client.session_transaction() as session:
         # Ensure the session has '_user_id' key (simulating user login)
         assert '_user_id' in session  # Mocked login will store the user_id in session
-        assert session['_user_id'] == mock_user_data['email']  # Mocked session data
-
+        assert session['_user_id'] == mock_user_data['email']  # Mocked session data (user's email)
 
 
 def test_login_invalid_user(client, db_connection):
