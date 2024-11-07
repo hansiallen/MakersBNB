@@ -6,7 +6,6 @@ from lib.spaces_repo import SpacesRepo
 from lib.spaces import Space
 from lib.auth import login_manager, LoginManager
 from flask_login import login_required, current_user, logout_user, login_user
-from lib.utils.password_security import hash_password
 from lib.user_repo import UserRepo, User
 from lib.database_connection import DatabaseConnection
 
@@ -16,7 +15,6 @@ from lib.database_connection import DatabaseConnection
 app = Flask(__name__)
 
 # Secret key for session management (required by Flask-Login)
-app.secret_key = 'your_secret_key'  # Change this to a secure key
 
 # Initialize the login manager with the Flask app
 
