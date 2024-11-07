@@ -6,9 +6,6 @@ from lib.utils.password_security import *
 
 # Initialize the login manager
 login_manager = LoginManager()
-db_connection = DatabaseConnection()
-db_connection.connect() 
-user_repo = UserRepo(db_connection) 
 
 class User(UserMixin):
     def __init__(self, user_id, email, password, active=True):
@@ -43,6 +40,9 @@ class User(UserMixin):
 # Setup the user_loader to load users by their email
 @login_manager.user_loader
 def user_loader(email):
+    db_connection = DatabaseConnection()
+    db_connection.connect() 
+    user_repo = UserRepo(db_connection) 
     # Fetch user from the database by email using UserRepo
     user_data = user_repo.get_user_by_email(email)
     if user_data:
@@ -52,6 +52,9 @@ def user_loader(email):
 # The request_loader can be used for request-based authentication
 @login_manager.request_loader
 def request_loader(request):
+    db_connection = DatabaseConnection()
+    db_connection.connect() 
+    user_repo = UserRepo(db_connection) 
     email = request.form.get('email')
     # Fetch user from the database by email using UserRepo
     user_data = user_repo.get_user_by_email(email)
