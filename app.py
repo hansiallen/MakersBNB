@@ -63,11 +63,6 @@ def get_space_info_route(id):
     # have an argument with the space id to show the correct space
     return render_template('/pages/space.html')
 
-app.route('/login', methods=['GET'])
-def get_login_route():
-    # should return a full login page
-    return render_template('/pages/login.html')
-
 
 @app.route('/sign-up', methods=['GET'])
 def get_sign_up_route():
@@ -98,16 +93,10 @@ def render_tos_page():
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
 # if started in test mode.
-if __name__ == '__main__':
-    app.run(debug=True, port=int(os.environ.get('PORT', 5001)))
+
 
 # Routes
 
-# Login route
-@login_manager.user_loader
-def load_user(user_id):
-    user_repo = UserRepo(db_connection)  # Assuming db_connection is initialized
-    return user_repo.get_user_by_id(user_id)
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
@@ -135,7 +124,7 @@ def login():
         # If login fails, redirect to the login page with a flash message
         return redirect(url_for('login'))
     
-    return render_template('login.html')
+    return render_template('pages/login.html')
 
 # Protected route
 @app.route('/protected', methods=['GET'])
@@ -152,4 +141,4 @@ def logout():
     return redirect(url_for('get_spaces_route'))  # Redirect to spaces list after logout
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=int(os.environ.get('PORT', 5001)))

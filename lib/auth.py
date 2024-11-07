@@ -10,20 +10,25 @@ db_connection.connect()
 user_repo = UserRepo(db_connection) 
 
 class User(UserMixin):
-    def __init__(self, user_id, email, password):
+    def __init__(self, user_id, email, password, active=True):
         self.id = user_id
         self.email = email
         self.password = password
+        self.active = active
     
-    # Implementing required methods for Flask-Login
-    def get_id(self):
-        return str(self.id)
     
     def is_authenticated(self):
-        return True if self.id else Falsw
+        return True if self.id else False
+    
+    def is_active(self):
+        # Here you should write whatever the code is
+        # that checks the database if your user is active
+        return self.active
 
     def verify_password(self, password):
         """Verify if the given password matches the stored hashed password."""
+        print (self.password, password)
+        print (check_password_hash(self.password, password))
         return check_password_hash(self.password, password)  # Compare hashed passwords
 
     def get_id(self):
