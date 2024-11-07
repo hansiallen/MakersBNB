@@ -1,5 +1,4 @@
 from flask_login import LoginManager, UserMixin
-from werkzeug.security import check_password_hash, generate_password_hash
 from lib.user_repo import UserRepo
 from lib.database_connection import DatabaseConnection
 from lib.utils.password_security import *

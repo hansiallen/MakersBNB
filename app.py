@@ -5,9 +5,7 @@ from lib.database_connection import get_flask_database_connection
 from lib.spaces_repo import SpacesRepo
 from lib.spaces import Space
 from flask_login import login_required, current_user, logout_user, login_user
-from lib.utils.password_security import hash_password
 from lib.user_repo import UserRepo, User
-from lib.database_connection import DatabaseConnection
 
     
 
