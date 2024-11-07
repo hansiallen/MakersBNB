@@ -20,8 +20,12 @@ body {
 .responsive-card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
 }
 
+.responsive-card-grid div {
+    border-radius: 5px;
+}
 .listing-card {
     border: 1px solid grey;
     padding: 10px;
