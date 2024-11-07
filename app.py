@@ -12,10 +12,6 @@ from lib.database_connection import DatabaseConnection
 
     
 
-db_connection = DatabaseConnection()
-db_connection.connect() 
-user_repo = UserRepo(db_connection)  
-
 # Create a new Flask app
 app = Flask(__name__)
 
@@ -29,7 +25,7 @@ login_manager.login_view = 'login'  # Redirect to the login route when needed
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_repo = UserRepo(db_connection)  # Assuming db_connection is initialized
+    user_repo = UserRepo(get_flask_database_connection(app))  # Assuming get_flask_database_connection(app) is initialized
     return user_repo.get_user_by_email(user_id)
 
 
