@@ -25,9 +25,13 @@ app.secret_key = 'your_secret_key'  # Change this to a secure key
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirect to the login route when needed
 
+@login_manager.user_loader
+def load_user(user_id):
+    user_repo = UserRepo(db_connection)  # Assuming db_connection is initialized
+    return user_repo.get_user_by_id(user_id)
+
 
 # == Your Routes Here ==
-
 # GET /index
 # Returns the homepage
 # Try it:
@@ -63,13 +67,6 @@ app.route('/login', methods=['GET'])
 def get_login_route():
     # should return a full login page
     return render_template('/pages/login.html')
-
-app.route('/login', methods=['POST'])
-def try_login_route():
-    # takes email and password from a form
-    # should give a return message as a either
-    #  'sucseffuly logged in' or 'incorrect email or password'
-    pass
 
 
 @app.route('/sign-up', methods=['GET'])
@@ -107,20 +104,42 @@ if __name__ == '__main__':
 # Routes
 
 # Login route
-@app.route('/login', methods=['POST'])
-def login():
-    email = request.form['email']
-    password = request.form['password']
-    
-    user = user_repo.get_user_by_email(email)  # Fetch user from DB
-    if user and check_password_hash(user.password, password):
-        login_user(user)  # Log the user in using Flask-Login
-        return redirect('/protected')
-    
-    return "Invalid credentials", 401  # Or appropriate error handling
+@login_manager.user_loader
+def load_user(user_id):
+    user_repo = UserRepo(db_connection)  # Assuming db_connection is initialized
+    return user_repo.get_user_by_id(user_id)
 
-@app.route('/protected', methods=['GET'])  # Ensure GET is allowed
-@login_required
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        print(f'Attempting login with email: {email}')
+        
+        user_repo = UserRepo(db_connection)
+        user = user_repo.get_user_by_email(email)
+        if user:
+            print(f'User found: {user.email}')
+            if check_password_hash(user.password, password):
+                print('Password is correct, logging in...')
+                login_user(user)
+                return redirect(url_for('protected'))  # Redirect to the protected page after successful login
+            else:
+                print('Incorrect password')
+                flash('Incorrect password', 'error')
+        else:
+            print('User not found')
+            flash('User not found', 'error')
+        
+        # If login fails, redirect to the login page with a flash message
+        return redirect(url_for('login'))
+    
+    return render_template('login.html')
+
+# Protected route
+@app.route('/protected', methods=['GET'])
+@login_required  # Ensure the user is logged in to access this page
 def protected():
     return f'Logged in as: {current_user.id}'
 
@@ -129,7 +148,8 @@ def protected():
 @login_required
 def logout():
     logout_user()  # Log the user out
-    return redirect(url_for('get_spaces_route'))  # Redirect to another page (e.g., homepage or list of spaces)
+    print(f'Logged out user {current_user.id}')  # Optional debug info
+    return redirect(url_for('get_spaces_route'))  # Redirect to spaces list after logout
 
 if __name__ == '__main__':
     app.run(debug=True)

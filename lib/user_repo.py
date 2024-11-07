@@ -6,15 +6,14 @@ class UserRepo:
 
     def add_user(self, user: User):
         """Add a user to the database."""
+        # Insert email and password only, ignoring the name field
         query = "INSERT INTO users (email, password) VALUES (%s, %s) RETURNING user_id"
         result = self.db_connection.execute(query, (user.email, user.password))
     
-        # Commit the changes
-        self.db_connection.commit()
-    
-        # Assuming the user ID is returned from the DB after insertion
-        user_id = result[0]['user_id']
-        user.id = user_id
+        if result:
+            return result[0]['user_id']
+        else:
+            raise ValueError("Failed to add user to the database.")
         
     def remove_user(self, user_id):
         """Remove a user from the database by ID."""

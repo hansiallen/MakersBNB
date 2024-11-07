@@ -10,14 +10,30 @@ db_connection.connect()
 user_repo = UserRepo(db_connection) 
 
 class User(UserMixin):
-    def __init__(self, email, password, user_id=None):
-        self.id = user_id  # Will be assigned from the DB if not passed
+    def __init__(self, user_id, email, password):
+        self.id = user_id
         self.email = email
-        self.password = password  # Store password (hashed)
+        self.password = password
+    
+    # Implementing required methods for Flask-Login
+    def get_id(self):
+        return str(self.id)
+    
+    def is_authenticated(self):
+        return True if self.id else Falsw
 
     def verify_password(self, password):
         """Verify if the given password matches the stored hashed password."""
         return check_password_hash(self.password, password)  # Compare hashed passwords
+
+    def get_id(self):
+        """Return the unique identifier for the user."""
+        return str(self.id)  # Flask-Login needs a string return type
+    
+    def get_user_by_email(self, email):
+    # Assume this returns a dictionary-like object from your DB
+    # e.g., {"user_id": 1, "email": "foo@bar.com", "password": "hashed_password"}
+        pass
 
 # Setup the user_loader to load users by their email
 @login_manager.user_loader
