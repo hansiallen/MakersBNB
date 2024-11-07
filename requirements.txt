@@ -5,3 +5,4 @@ pytest-playwright==0.4.4
 pytest-xprocess==0.23.0
 mock
 flask_login
+werkzeug
