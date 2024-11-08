@@ -5,28 +5,38 @@
     <p>List your space on MakersBnB and connect with a community of creative and professional individuals looking for unique places to stay and work. Fill out the form below with details about your space, including a name, description, nightly price, and availability dates, to make it ready for bookings. Share your space and start hosting with ease!</p>
 
     <div class="create-space-box">
-        <form action="./" method="POST">
-            <!-- We check to see if there are any errors from a previous submission -->
-            {% if error %}
-            <!-- If so, we show them. -->
-            <p class="error">We encountered the following error with your submission: {{ error }}</p>
-            {% endif %}
+        <form method="POST">
+            <!-- Display any error messages if available -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="errors">
+                        {% for category, message in messages %}
+                            <p class="error">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
             <label for="name">Name</label>
-            <input type="text" name="name" id="name">
+            <input type="text" name="name" id="name" value="{{ request.form['name'] if request.method == 'POST' else '' }}" required>
+            
             <label for="description">Description</label>
-            <textarea name="description" id="description"></textarea>
+            <textarea name="description" id="description" required>{{ request.form['description'] if request.method == 'POST' else '' }}</textarea>
+            
             <label for="price-per-night">Price per night (£)</label>
-            <input type="text" name="price-per-night" id="price-per-night">
+            <input type="text" name="price-per-night" id="price-per-night" value="{{ request.form['price-per-night'] if request.method == 'POST' else '' }}" required>
+            
             <div class="two-col-grid">
                 <div>
                     <label for="available-from">Available from (DD/MM/YY)</label>
-                    <input type="date" name="available-from" id="available-from">
+                    <input type="date" name="available-from" id="available-from" value="{{ request.form['available-from'] if request.method == 'POST' else '' }}" required>
                 </div>
                 <div>
                     <label for="available-to">Available to (DD/MM/YY)</label>
-                    <input type="date" name="available-to" id="available-to">
+                    <input type="date" name="available-to" id="available-to" value="{{ request.form['available-to'] if request.method == 'POST' else '' }}" required>
                 </div>
             </div>
+            
             <button type="submit">List my space</button>
         </form>
     </div>
