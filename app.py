@@ -153,37 +153,54 @@ def render_tos_page():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        print(f'Attempting login with email: {email}')
-        
-        user_repo = UserRepo(get_flask_database_connection(app))
-        user = user_repo.get_user_by_email(email)
-        if user:
-            print(f'User found: {user.email}')
-            if check_password_hash(user.password, password):
-                print('Password is correct, logging in...')
-                login_user(user)
-                return redirect(url_for('protected'))  # Redirect to the protected page after successful login
+        try:
+            # Attempt to get email and password from the form
+            email = request.form['email'].strip()
+            password = request.form['password'].strip()
+            
+            # Check if either field is empty
+            if not email or not password:
+                flash('Email and password cannot be empty.', 'error')
+                return redirect(url_for('login'))
+
+            print(f'Attempting login with email: {email}')
+            
+            # Initialize UserRepo and fetch user by email
+            user_repo = UserRepo(get_flask_database_connection(app))
+            user = user_repo.get_user_by_email(email)
+            
+            if user:
+                print(f'User found: {user.email}')
+                
+                # Check if the provided password matches the stored hash
+                if check_password_hash(user.password, password):
+                    print('Password is correct, logging in...')
+                    login_user(user)
+                    return redirect(url_for('protected'))  # Redirect on success
+                else:
+                    print('Incorrect password')
+                    flash('Incorrect password', 'error')
             else:
-                print(user.password)
-                print(password)
-                print('Incorrect password')
-                flash('Incorrect password', 'error')
-        else:
-            print('User not found')
-            flash('User not found', 'error')
-        
-        # If login fails, redirect to the login page with a flash message
-        return redirect(url_for('login'))
-    
-    return render_template('pages/login.html',logged_in= current_user.is_authenticated)
+                print('User not found')
+                flash('User not found', 'error')
+
+            # Redirect to login on failure
+            return redirect(url_for('login'))
+
+        except KeyError as e:
+            # Handle missing form fields
+            flash(f'Missing field: {e.args[0]}', 'error')
+            return redirect(url_for('login'))
+
+    # Render login form for GET request
+    return render_template('pages/login.html')
+
 
 # Protected route
 @app.route('/protected', methods=['GET'])
 @login_required  # Ensure the user is logged in to access this page
 def protected():
-    return f'Logged in as: {current_user.id}'
+    return f'Logged in as: {current_user.id}<meta http-equiv="refresh" content="0; url=/">'
 
 # Logout route
 @app.route('/logout')
