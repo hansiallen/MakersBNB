@@ -48,11 +48,42 @@ def get_spaces_route():
     return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= current_user.is_authenticated)
 
 
-@app.route('/add-spaces',methods=['POST'])
+@app.route('/add-spaces', methods=['GET', 'POST'])
+#@login_required  # Ensure only logged-in users can add spaces
 def add_spaces_route():
-    # take in all the information for the space and the users id
-    # this page returns a link to redirect to the login screen if not logged in
-    pass
+    if request.method == 'POST':
+        # Retrieve form data
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price_per_night = request.form.get('price-per-night')
+        available_from = request.form.get('available-from')
+        available_to = request.form.get('available-to')
+
+        # Basic validation
+        if not name or not price_per_night or not available_from or not available_to:
+            flash("All fields are required.", "error")
+            return redirect(url_for('add_spaces_route'))
+
+        # Add space to the database
+        try:
+            repo = SpacesRepo(get_flask_database_connection(app))
+            space = Space(
+                id=None, 
+                owner_id=current_user.id, # Logged in user as the owner
+                name=name,
+                description=description,
+                price_per_night=float(price_per_night)
+            )
+            repo.add_space(space)
+            flash("Space listed successfully!", "success")
+            return redirect(url_for('get_spaces_route'))
+        except Exception as e:
+            print(e)  # Debugging
+            flash("Error listing space.", "error")
+            return redirect(url_for('add_spaces_route'))
+
+    return render_template('pages/add-spaces.html')
+
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):

@@ -1,0 +1,44 @@
+{% include '/core/header.html' %}
+{% include '/core/nav.html' %}
+
+<main>
+    <h1>List a New Space</h1>
+    <p>Provide details of the space you want to list.</p>
+
+    <div class="create-space-box">
+        <form action="{{ url_for('add_spaces_route') }}" method="POST">
+            <!-- Error displayes if needed -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <label for="name">Space Name</label>
+            <input type="text" name="name" id="name" required placeholder="e.g., Cozy Cottage">
+
+            <label for="description">Description</label>
+            <textarea name="description" id="description" required placeholder="Describe the space..."></textarea>
+
+            <label for="price-per-night">Price per Night (£)</label>
+            <input type="number" name="price-per-night" id="price-per-night" required placeholder="e.g., 100">
+
+            <div class="two-col-grid">
+                <div>
+                    <label for="available-from">Available From (DD/MM/YY)</label>
+                    <input type="date" name="available-from" id="available-from" required>
+                </div>
+                <div>
+                    <label for="available-to">Available To (DD/MM/YY)</label>
+                    <input type="date" name="available-to" id="available-to" required>
+                </div>
+            </div>
+
+            <button type="submit">List My Space</button>
+        </form>
+    </div>
+</main>
+
+{% include '/core/footer.html' %}
