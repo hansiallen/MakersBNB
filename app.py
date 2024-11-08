@@ -49,47 +49,41 @@ def get_spaces_route():
     return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= current_user.is_authenticated)
 
 
-@app.route('/create-space-listing', methods=['GET', 'POST'])
-@login_required
+@app.route('/add-spaces', methods=['GET', 'POST'])
+#@login_required  # Ensure only logged-in users can add spaces
 def add_spaces_route():
     if request.method == 'POST':
-        # Collect data from the form
-        name = request.form.get('name', '').strip()
-        description = request.form.get('description', '').strip()
-        price_per_night = request.form.get('price-per-night', '').strip()
-        location = request.form.get('location', '').strip()
-        capacity = request.form.get('capacity', '').strip()
+        # Retrieve form data
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price_per_night = request.form.get('price-per-night')
+        available_from = request.form.get('available-from')
+        available_to = request.form.get('available-to')
 
-        # Basic form validation
-        if not name or not description or not price_per_night or not location or not capacity:
-            flash('All fields are required.', 'error')
-            return redirect(url_for('add_spaces_route'))  # Redirect back if validation fails
+        # Basic validation
+        if not name or not price_per_night or not available_from or not available_to:
+            flash("All fields are required.", "error")
+            return redirect(url_for('add_spaces_route'))
 
+        # Add space to the database
         try:
-            # Initialize the repo to interact with the database
-            spaces_repo = SpacesRepo(get_flask_database_connection(app))
-
-            # Create a Space object with the provided data (id will be assigned later)
-            new_space = Space(
-                owner_id=current_user.id,  # Use the logged-in user's ID
+            repo = SpacesRepo(get_flask_database_connection(app))
+            space = Space(
+                id=None, 
+                owner_id=current_user.id, # Logged in user as the owner
                 name=name,
                 description=description,
                 price_per_night=float(price_per_night)
             )
-
-            # Add the new space to the database
-            added_space = spaces_repo.add_space(new_space)
-
-            # If successful, flash a success message and redirect
-            flash('Your space has been listed successfully!', 'success')
-            return redirect(url_for('get_spaces_route'))  # Redirect to the spaces list page
-
+            repo.add_space(space)
+            flash("Space listed successfully!", "success")
+            return redirect(url_for('get_spaces_route'))
         except Exception as e:
-            flash(f'Error: {e}', 'error')
-            return redirect(url_for('add_spaces_route'))  # Redirect back if there was an error
+            print(e)  # Debugging
+            flash("Error listing space.", "error")
+            return redirect(url_for('add_spaces_route'))
 
-    return render_template('pages/create-space-listing.html')  # Render the space listing form on GET
-
+    return render_template('pages/add-spaces.html',logged_in= current_user.is_authenticated)
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
@@ -100,7 +94,7 @@ def get_space_info_route(id):
     if not space:
         return "Couldn't find the space you're looking for", 404
     
-    return render_template('pages/space.html', space=space)
+    return render_template('pages/space.html', space=space,logged_in= current_user.is_authenticated)
 
 
 @app.route('/sign-up', methods=['GET', 'POST'])
@@ -119,48 +113,46 @@ def sign_up():
             flash('Invalid email format.', 'error')
             return redirect(url_for('sign_up'))  # Redirect back to the sign-up page
         
-        try:
-            # Creating a user in the repo with a hashed password
-            user_repo = UserRepo(get_flask_database_connection(app))
-
-            # Attempt to add the user
-            user = user_repo.add_user(User(None, email, generate_password_hash(password)))
-            
-            # After adding, check if the user is added successfully
-            user = user_repo.get_user_by_email(email)
-            if user:
-                print(f'User created: {user.email}')
-                flash('User successfully created, you can log in now.', 'success')
-                return redirect(url_for('login'))  # Redirect to the login page after successful sign-up
-            else:
-                flash('User not found after creation attempt.', 'error')
-                return redirect(url_for('sign_up'))  # Redirect back if something went wrong
-
-        except IntegrityError:
-            # Catch database error related to duplicate email (unique constraint violation)
-            flash('User already exists, please use a different email.', 'error')
-            return redirect(url_for('sign_up'))  # Redirect back to the sign-up page if user exists
+        # Create user repo instance
+        user_repo = UserRepo(get_flask_database_connection(app))
         
+        # Check if the email is already in use
+        if user_repo.get_user_by_email(email):
+            flash('Email is already in use.', 'error')
+            return redirect(url_for('sign_up'))
+        
+        try:
+            # Attempt to add the user
+            new_user = User(None, email, generate_password_hash(password))  # Creating user instance
+            user = user_repo.add_user(new_user)  # Add user to the database
+            
+            # Check if the user was successfully added
+            if user:
+                flash('User successfully created, you can log in now.', 'success')
+                return redirect(url_for('login'))  # Redirect to login page after successful sign-up
+            else:
+                flash('User creation failed. Please try again.', 'error')
+                return redirect(url_for('sign_up'))  # Redirect back to sign-up page
         except Exception as e:
-            flash(f'User already exists, please use a different email.', 'error')  # Flash any exception message that occurs
-            return redirect(url_for('sign_up'))  # Redirect back in case of error
+            print(f"Error creating user: {e}")
+            flash('An error occurred while creating your account. Please try again.', 'error')
+            return redirect(url_for('sign_up'))  # Redirect back to sign-up page
     
-    return render_template('/pages/sign-up.html')
-
-
+    # If GET request, render sign-up page
+    return render_template('/pages/sign-up.html', logged_in=current_user.is_authenticated)
 
 
 @app.route('/about', methods=['GET'])
 def render_about_page():
-    return render_template('pages/about.html', is_about= True)
+    return render_template('pages/about.html', is_about= True, logged_in= current_user.is_authenticated)
 
 @app.route('/privacy', methods=['GET'])
 def render_privacy_policy():
-    return render_template('pages/privacy-policy.html')
+    return render_template('pages/privacy-policy.html',logged_in= current_user.is_authenticated)
 
 @app.route('/tos', methods=['GET'])
 def render_tos_page():
-    return render_template('pages/tos.html')
+    return render_template('pages/tos.html',logged_in= current_user.is_authenticated)
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
@@ -211,15 +203,16 @@ def login():
             # Handle missing form fields
             flash(f'Missing field: {e.args[0]}', 'error')
             return redirect(url_for('login'))
-    
+
     # Render login form for GET request
     return render_template('pages/login.html')
+
 
 # Protected route
 @app.route('/protected', methods=['GET'])
 @login_required  # Ensure the user is logged in to access this page
 def protected():
-    return f'Logged in as: {current_user.id}'
+    return f'Logged in as: {current_user.id}<meta http-equiv="refresh" content="0; url=/">'
 
 # Logout route
 @app.route('/logout')
