@@ -9,7 +9,7 @@ from psycopg.rows import dict_row
 # That's why we have provided it!
 class DatabaseConnection:
     # VVV CHANGE BOTH OF THESE VVV
-    DEV_DATABASE_NAME = "makersbnb"
+    DEV_DATABASE_NAME = "makersbnb_test"
     if os.getenv('GITHUB_ACTIONS') == 'true':
        DEV_DATABASE_NAME = "makersbnb_test" 
     TEST_DATABASE_NAME = "makersbnb_test"

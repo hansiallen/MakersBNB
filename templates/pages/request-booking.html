@@ -6,7 +6,7 @@
     <p>{{ space.description }}</p>
     <p>Price: £{{ space.price_per_night }} per night</p>
 
-    <form action="{{ url_for('request_booking', id=space.id) }}" method="POST">
+    <form action="./request-booking" method="POST">
         <label for="start_date">Start Date</label>
         <input type="date" name="start_date" id="start_date" required>
         
