@@ -1,4 +1,5 @@
 from lib.spaces import Space
+
 class SpacesRepo:
     def __init__(self,con):
         self.db_connection = con
