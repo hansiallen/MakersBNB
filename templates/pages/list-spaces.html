@@ -2,12 +2,9 @@
 {% include '/core/nav.html' %}
 <main>
     <h1>Book a space</h1>
+    <p>Welcome to MakersBnB, where you can explore a range of unique and inspiring spaces available for booking. Whether you're planning a creative retreat, a weekend getaway, or a workspace change, our listings offer diverse locations tailored to fit your needs. Use the options below to filter spaces by availability, and start your next experience today!</p>
+    <a href="/create-space-listing/"><p class="button-link">List a Space</p></a>
 
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quam lacus, vestibulum nec eleifend in, dignissim nec ex. Duis non enim ut nunc luctus hendrerit fringilla id metus. Morbi vitae ornare mi, sit amet pretium velit. Praesent laoreet mi sit amet fermentum varius. Praesent nisi augue, efficitur porta ullamcorper pulvinar, vulputate ut est. Mauris et massa eros. Phasellus nisi ante, vehicula et ultricies et, varius eu mi.</p>
-    <a href="/create-space-listing"><p class="button-link">List a Space</p></a>
-
-    <p>MakersBnB connects you with unique spaces you can book by the night for work, creative projects, or relaxation. Browse available locations, select your dates, and secure a space that meets your needs, all in one simple platform.</p>
-   
     {% if logged_in %}
     <a href="/add-spaces"><button>List a Space</button></a>
     {% endif %}
