@@ -3,7 +3,10 @@
 <main>
     <h1>Book a space</h1>
     <p>MakersBnB connects you with unique spaces you can book by the night for work, creative projects, or relaxation. Browse available locations, select your dates, and secure a space that meets your needs, all in one simple platform.</p>
-    <a href="/create-space-listing/"><p class="button-link">List a Space</p></a>
+   
+    {% if logged_in %}
+    <a href="/add-spaces"><button>List a Space</button></a>
+    {% endif %}
     <br>
     <h2>Filter by availability on date:</h2>
     <form action="./" method="get">
