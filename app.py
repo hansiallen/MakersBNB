@@ -82,7 +82,7 @@ def add_spaces_route():
             flash("Error listing space.", "error")
             return redirect(url_for('add_spaces_route'))
 
-    return render_template('pages/add-spaces.html')
+    return render_template('pages/add-spaces.html',logged_in= current_user.is_authenticated)
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
@@ -93,7 +93,7 @@ def get_space_info_route(id):
     if not space:
         return "Couldn't find the space you're looking for", 404
     
-    return render_template('pages/space.html', space=space)
+    return render_template('pages/space.html', space=space,logged_in= current_user.is_authenticated)
 
 
 @app.route('/sign-up', methods=['GET','POST'])
@@ -128,19 +128,19 @@ def sign_up():
         return redirect(url_for('login'))
     
     # should return a full login page
-    return render_template('/pages/sign-up.html')
+    return render_template('/pages/sign-up.html',logged_in= current_user.is_authenticated)
 
 @app.route('/about', methods=['GET'])
 def render_about_page():
-    return render_template('pages/about.html', is_about= True)
+    return render_template('pages/about.html', is_about= True, logged_in= current_user.is_authenticated)
 
 @app.route('/privacy', methods=['GET'])
 def render_privacy_policy():
-    return render_template('pages/privacy-policy.html')
+    return render_template('pages/privacy-policy.html',logged_in= current_user.is_authenticated)
 
 @app.route('/tos', methods=['GET'])
 def render_tos_page():
-    return render_template('pages/tos.html')
+    return render_template('pages/tos.html',logged_in= current_user.is_authenticated)
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
@@ -191,9 +191,10 @@ def login():
             # Handle missing form fields
             flash(f'Missing field: {e.args[0]}', 'error')
             return redirect(url_for('login'))
-    
+
     # Render login form for GET request
     return render_template('pages/login.html')
+
 
 # Protected route
 @app.route('/protected', methods=['GET'])
