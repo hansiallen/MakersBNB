@@ -7,7 +7,7 @@
 
     <div class="create-space-box">
         <form action="{{ url_for('add_spaces_route') }}" method="POST">
-            <!-- Error displayes if needed -->
+            <!-- Error displayes if neede -->
             {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
                 {% for category, message in messages %}

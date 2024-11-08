@@ -84,7 +84,6 @@ def add_spaces_route():
 
     return render_template('pages/add-spaces.html')
 
-
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
     spaces_repo = SpacesRepo(get_flask_database_connection(app))
