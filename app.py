@@ -49,7 +49,7 @@ def get_spaces_route():
 
 
 @app.route('/add-spaces', methods=['GET', 'POST'])
-#@login_required  # Ensure only logged-in users can add spaces
+@login_required  # Ensure only logged-in users can add spaces
 def add_spaces_route():
     if request.method == 'POST':
         # Retrieve form data
@@ -83,6 +83,35 @@ def add_spaces_route():
             return redirect(url_for('add_spaces_route'))
 
     return render_template('pages/add-spaces.html')
+
+@app.route('/request', methods=['GET', 'POST'])
+@login_required  # Ensure only logged-in users can add spaces
+def user_request():
+    if request.method == 'POST':
+        # Retrieve form data
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price_per_night = request.form.get('price-per-night')
+        available_from = request.form.get('available-from')
+        available_to = request.form.get('available-to')
+
+        # Basic validation
+        if not name or not price_per_night or not available_from or not available_to:
+            flash("All fields are required.", "error")
+            return redirect(url_for('add_spaces_route'))
+
+        # Add space to the database
+        repo = SpacesRepo(get_flask_database_connection(app))
+        space = Space(
+            id=None, 
+            owner_id=current_user.id, # Logged in user as the owner
+            name=name,
+            description=description,
+            price_per_night=float(price_per_night)
+            )
+
+    return render_template('pages/bookings.html')
+
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):

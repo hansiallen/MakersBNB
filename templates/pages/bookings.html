@@ -1,0 +1,47 @@
+{% include '/core/header.html' %}
+{% include '/core/nav.html' %}
+<main>
+  <h1>Booking statuses</h1>
+  <a href="/create-space-listing/"><p class="button-link">List a Space</p></a>
+  <br>
+  <h2>Filter by availability on date:</h2>
+  <form action="./" method="get">
+    <div class="two-col-grid">
+      <div>
+        <label for="available-from">Available from (DD/MM/YY)</label>
+        <input type="date" name="available-from" id="available-from">
+      </div>
+      <div>
+        <label for="available-to">Available to (DD/MM/YY)</label>
+        <input type="date" name="available-to" id="available-to">
+      </div>
+    </div>
+    <button type="submit">Filter for availability</button>
+  </form>
+  <h2>Available Spaces</h2>
+  <div class="two-col-grid">
+    <div class="responsive-card-grid">
+      <div>
+        <h3>Bookings that I have made</h3>
+        {% for booking in my_bookings %}
+        <div class="listing-card">
+        <h3>{{ space.name }}</h3>
+        <p>Status: </p>
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <h3>Bookings for Spaces that I own</h3>
+        {% for booking in space_bookings %}
+        <div class="listing-card">
+        <a href="/space/{{booking.space_id}}" name="{{ space.name }}">
+        <h3>{{ space.name }}</h3>
+        <p>{{ space.description }}</p>
+        <p>Price: £{{ space.price_per_night }} per night</p></a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+{% include '/core/footer.html' %}
