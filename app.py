@@ -64,23 +64,21 @@ def add_spaces_route():
         if not name or not description or not price_per_night or not location or not capacity:
             flash('All fields are required.', 'error')
             return redirect(url_for('add_spaces_route'))  # Redirect back if validation fails
-        
+
         try:
             # Initialize the repo to interact with the database
             spaces_repo = SpacesRepo(get_flask_database_connection(app))
 
-            # Create a Space object with the provided data
+            # Create a Space object with the provided data (id will be assigned later)
             new_space = Space(
+                owner_id=current_user.id,  # Use the logged-in user's ID
                 name=name,
                 description=description,
-                price_per_night=float(price_per_night),
-                location=location,
-                capacity=int(capacity),
-                user_id=current_user.id  # Store the ID of the logged-in user
+                price_per_night=float(price_per_night)
             )
-            
+
             # Add the new space to the database
-            spaces_repo.add_space(new_space)
+            added_space = spaces_repo.add_space(new_space)
 
             # If successful, flash a success message and redirect
             flash('Your space has been listed successfully!', 'success')
@@ -89,7 +87,7 @@ def add_spaces_route():
         except Exception as e:
             flash(f'Error: {e}', 'error')
             return redirect(url_for('add_spaces_route'))  # Redirect back if there was an error
-    
+
     return render_template('pages/create-space-listing.html')  # Render the space listing form on GET
 
 
