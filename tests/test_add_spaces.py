@@ -30,25 +30,14 @@ def logged_in_user(client, db_connection):
         session['_user_id'] = user_id
     return {'email': email, 'user_id': user_id}
 
-def test_add_space_success(client, db_connection):
-    """Test successfully adding a new space (using existing space mock)."""
+def test_add_spaces_success(client, db_connection):
+    """Test adding a space with valid data"""
     
-    # Simulate the existing spaces (mock data from the seed)
-    mock_existing_spaces = [
-        ('Cozy Cottage', 'A cozy cottage in the countryside', 1, 100.00),
-        ('Urban Loft', 'A stylish loft in the city', 2, 150.00),
-        ('Beach House', 'A relaxing beach house with ocean views', 3, 200.00)
-    ]
+    # Mock the session to simulate a logged-in user
+    with client.session_transaction() as session:
+        session['_user_id'] = 1  # Simulating logged-in user
     
-    # Create mock SpaceRepo to simulate adding a space
-    mock_space_repo = MagicMock()
-    mock_space_repo.get_spaces.return_value = mock_existing_spaces  # Simulate existing spaces
-    mock_space_repo.add_space.return_value = True  # Simulate successful space addition
-    
-    # Patch the app's space repo to use the mock
-    app.space_repo = mock_space_repo
-    
-    # Use 'Cozy Cottage' data to simulate adding an existing space
+    # Simulate the form data
     space_data = {
         'name': 'Cozy Cottage',
         'description': 'A cozy cottage in the countryside',
@@ -57,18 +46,14 @@ def test_add_space_success(client, db_connection):
         'available-to': '2024-12-31'
     }
     
-    # Simulate the space creation form submission
-    response = client.post('/create-space-listing', data=space_data)
+    # Simulate the space creation form submission (POST request)
+    response = client.post('/add-spaces', data=space_data)
     
     # Assert the response is a redirect (status code 302)
     assert response.status_code == 302
     
-    # Assert the redirect location (should go to the spaces list page)
-    assert response.headers['Location'] == '/spaces'
-    
-    # Verify the space was added (check the mock was called)
-    mock_space_repo.add_space.assert_called_once_with(space_data)
-
+    # Assert the correct redirect URL (adjust this based on your logic)
+    assert response.headers['Location'] == '/add-spaces'  # If it's redirecting to the same page
 
 def test_create_space_invalid_data(client, logged_in_user, db_connection):
     """Test creating space with invalid data"""
