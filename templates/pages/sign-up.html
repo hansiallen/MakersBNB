@@ -9,6 +9,15 @@
         <!-- If so, print the error -->
         <p class="error">Sign up error: {{ error }}</p>
         {% endif %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <p>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}" style="background: #c48278; padding: 10px; border: 1px solid red; color:white; float:left">{{ message }}</p> <br><br> <!-- category can be used for styling (e.g., error, success) -->
+                    {% endfor %}
+                </p>
+            {% endif %}
+        {% endwith %}
         <label for="email">Email Address</label>
         <input required type="text" name="email" id="email" placeholder="email@example.com">
         <label for="password">Password</label>
