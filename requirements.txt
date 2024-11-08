@@ -6,3 +6,4 @@ pytest-xprocess==0.23.0
 mock
 flask_login
 werkzeug
+sqlalchemy

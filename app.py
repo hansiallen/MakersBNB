@@ -11,6 +11,7 @@ from datetime import datetime
 from lib.bookings_repo import BookingRepo
 from lib.bookings import Booking
 from lib.booking_is_available import booking_is_available
+from sqlalchemy.exc import IntegrityError
 
     
 
@@ -86,7 +87,7 @@ def add_spaces_route():
             flash("Error listing space.", "error")
             return redirect(url_for('add_spaces_route'))
 
-    return render_template('pages/add-spaces.html')
+    return render_template('pages/add-spaces.html',logged_in= current_user.is_authenticated)
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
@@ -97,7 +98,7 @@ def get_space_info_route(id):
     if not space:
         return "Couldn't find the space you're looking for", 404
     
-    return render_template('pages/space.html', space=space)
+    return render_template('pages/space.html', space=space,logged_in= current_user.is_authenticated)
 
 @app.route('/space/<int:id>/request-booking', methods=['GET', 'POST'])
 @login_required
@@ -182,51 +183,62 @@ def confirm_booking(booking_id):
     return redirect(url_for('get_space_info_route', id=space.id))
 
 
-@app.route('/sign-up', methods=['GET','POST'])
+@app.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
-    # takes username, email and password from a form
-    # should give a return message as a either
-    #  sucseffuly created in or incorrect email or password
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        print(f'Attempting login with email: {email}')
+        email = request.form['email'].strip()
+        password = request.form['password'].strip()
+
+        # Check if email or password is empty
+        if not email or not password:
+            flash('Email and password cannot be empty.', 'error')
+            return redirect(url_for('sign_up'))  # Redirect back to the sign-up page
         
+        # Check if the email is in a valid format (basic check)
+        if '@' not in email or '.' not in email:
+            flash('Invalid email format.', 'error')
+            return redirect(url_for('sign_up'))  # Redirect back to the sign-up page
+        
+        # Create user repo instance
         user_repo = UserRepo(get_flask_database_connection(app))
-        user = user_repo.add_user(User(None,email,generate_password_hash(password)))
-        user = user_repo.get_user_by_email(email)
-        if user:
-            print(f'User found: {user.email}')
-            if check_password_hash(user.password, password):
-                print('Password is correct, logging in...')
-                login_user(user)
-                return redirect(url_for('protected'))  # Redirect to the protected page after successful login
-            else:
-                print(user.password)
-                print(password)
-                print('Incorrect password')
-                flash('Incorrect password', 'error')
-        else:
-            print('User not found')
-            flash('User not found', 'error')
         
-        # If login fails, redirect to the login page with a flash message
-        return redirect(url_for('login'))
+        # Check if the email is already in use
+        if user_repo.get_user_by_email(email):
+            flash('Email is already in use.', 'error')
+            return redirect(url_for('sign_up'))
+        
+        try:
+            # Attempt to add the user
+            new_user = User(None, email, generate_password_hash(password))  # Creating user instance
+            user = user_repo.add_user(new_user)  # Add user to the database
+            
+            # Check if the user was successfully added
+            if user:
+                flash('User successfully created, you can log in now.', 'success')
+                return redirect(url_for('login'))  # Redirect to login page after successful sign-up
+            else:
+                flash('User creation failed. Please try again.', 'error')
+                return redirect(url_for('sign_up'))  # Redirect back to sign-up page
+        except Exception as e:
+            print(f"Error creating user: {e}")
+            flash('An error occurred while creating your account. Please try again.', 'error')
+            return redirect(url_for('sign_up'))  # Redirect back to sign-up page
     
-    # should return a full login page
-    return render_template('/pages/sign-up.html')
+    # If GET request, render sign-up page
+    return render_template('/pages/sign-up.html', logged_in=current_user.is_authenticated)
+
 
 @app.route('/about', methods=['GET'])
 def render_about_page():
-    return render_template('pages/about.html', is_about= True)
+    return render_template('pages/about.html', is_about= True, logged_in= current_user.is_authenticated)
 
 @app.route('/privacy', methods=['GET'])
 def render_privacy_policy():
-    return render_template('pages/privacy-policy.html')
+    return render_template('pages/privacy-policy.html',logged_in= current_user.is_authenticated)
 
 @app.route('/tos', methods=['GET'])
 def render_tos_page():
-    return render_template('pages/tos.html')
+    return render_template('pages/tos.html',logged_in= current_user.is_authenticated)
 
 # These lines start the server if you run this file directly
 # They also start the server configured to use the test database
@@ -277,15 +289,16 @@ def login():
             # Handle missing form fields
             flash(f'Missing field: {e.args[0]}', 'error')
             return redirect(url_for('login'))
-    
+
     # Render login form for GET request
     return render_template('pages/login.html')
+
 
 # Protected route
 @app.route('/protected', methods=['GET'])
 @login_required  # Ensure the user is logged in to access this page
 def protected():
-    return f'Logged in as: {current_user.id}'
+    return f'Logged in as: {current_user.id}<meta http-equiv="refresh" content="0; url=/">'
 
 # Logout route
 @app.route('/logout')
