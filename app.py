@@ -199,7 +199,7 @@ def login():
 @app.route('/protected', methods=['GET'])
 @login_required  # Ensure the user is logged in to access this page
 def protected():
-    return f'Logged in as: {current_user.id}'
+    return f'Logged in as: {current_user.id}<meta http-equiv="refresh" content="0; url=/">'
 
 # Logout route
 @app.route('/logout')
