@@ -147,4 +147,3 @@ def test_login_user_not_found(client):
     # Check that the flash message indicates user not found
     with client.session_transaction() as session:
         assert 'User not found' in session['_flashes'][0][1]
-
