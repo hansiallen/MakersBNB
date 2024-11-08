@@ -49,11 +49,50 @@ def get_spaces_route():
     return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= current_user.is_authenticated)
 
 
-@app.route('/add-spaces',methods=['POST'])
+@app.route('/create-space-listing', methods=['GET', 'POST'])
+@login_required  # Ensures user must be logged in
 def add_spaces_route():
-    # take in all the information for the space and the users id
-    # this page returns a link to redirect to the login screen if not logged in
-    pass
+    if request.method == 'POST':
+        # Collect data from the form
+        name = request.form['name'].strip()
+        description = request.form['description'].strip()
+        price_per_night = request.form['price_per_night'].strip()
+        location = request.form['location'].strip()
+        capacity = request.form['capacity'].strip()
+
+        # Basic form validation
+        if not name or not description or not price_per_night or not location or not capacity:
+            flash('All fields are required.', 'error')
+            return redirect(url_for('add_spaces_route'))  # Redirect back if validation fails
+        
+        # Try to add the space to the database
+        try:
+            # Initialize the repo to interact with the database
+            spaces_repo = SpacesRepo(get_flask_database_connection(app))
+
+            # Create a Space object with the provided data
+            new_space = Space(
+                name=name,
+                description=description,
+                price_per_night=float(price_per_night),
+                location=location,
+                capacity=int(capacity),
+                user_id=current_user.id  # Store the ID of the logged-in user
+            )
+            
+            # Add the new space to the database
+            spaces_repo.add_space(new_space)
+
+            # If successful, flash a success message and redirect
+            flash('Your space has been listed successfully!', 'success')
+            return redirect(url_for('get_spaces_route'))  # Redirect to the spaces list page
+
+        except Exception as e:
+            flash(f'Error: {e}', 'error')
+            return redirect(url_for('add_spaces_route'))  # Redirect back if there was an error
+    
+    return render_template('pages/create-space-listing.html')  # Render the space listing form on GET
+
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
