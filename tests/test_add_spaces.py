@@ -137,7 +137,6 @@ def test_create_space_missing_field(client, logged_in_user, db_connection):
         'description': 'A small but comfortable space.',
         'price-per-night': '50',
         'location': 'New York',
-        'capacity': '2',
         'available-from': '2024-11-01',
         'available-to': '2024-11-30'
     }
@@ -166,7 +165,6 @@ def test_create_space_invalid_price(client, logged_in_user, db_connection):
         'description': 'A luxurious space.',
         'price-per-night': 'invalid-price',
         'location': 'Los Angeles',
-        'capacity': '4',
         'available-from': '2024-12-01',
         'available-to': '2024-12-31'
     }
@@ -194,7 +192,6 @@ def test_create_space_missing_description(client, logged_in_user, db_connection)
         'name': 'Spacious Loft',
         'price-per-night': '100',
         'location': 'San Francisco',
-        'capacity': '4',
         'available-from': '2024-12-01',
         'available-to': '2024-12-31'
     }

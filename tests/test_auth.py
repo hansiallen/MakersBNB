@@ -255,7 +255,7 @@ def test_signup_user_exists(client, db_connection):
     
     # Check that the flash message indicates the user already exists
     with client.session_transaction() as session:
-        assert 'User already exists, please use a different email.' in session['_flashes'][0][1]
+        assert 'Email is already in use.' in session['_flashes'][0][1]
 
 
 
