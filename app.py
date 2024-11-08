@@ -134,16 +134,15 @@ def request_booking(id):
             flash("The space is not available for the selected dates.", "error")
             return redirect(url_for('request_booking', id=id))
         
-        # Add the booking request to the database
         booking = Booking(
             booking_id=None,
             space_id=space.id,
             user_id=current_user.id,
             start_date=start_date,
             end_date=end_date,
-            accepted=False  # Initial state is pending
+            accepted=False  
         )
-        booking_id = booking_repo.add_booking(booking)
+        id =booking_repo.add_booking(booking)
         
         flash("Booking request sent successfully!", "success")
         return redirect(url_for('get_space_info_route', id=id))
@@ -151,6 +150,36 @@ def request_booking(id):
     # Render booking request form for GET request
     return render_template('pages/request-booking.html', space=space)
 
+@app.route('/booking/<int:booking_id>/confirm', methods=['POST'])
+@login_required
+def confirm_booking(booking_id):
+    booking_repo = BookingRepo(get_flask_database_connection(app))
+    booking = booking_repo.get_booking(booking_id)
+
+    # Ensure booking exists and that the current user is the space owner
+    if not booking:
+        flash("Booking not found.", "error")
+        return redirect(url_for('get_spaces_route'))
+    space = SpacesRepo(get_flask_database_connection(app)).get_space(booking.space_id)
+    if not space or space.owner_id != current_user.id:
+        flash("Unauthorized action.", "error")
+        return redirect(url_for('get_spaces_route'))
+
+    # Update booking status based on the owner's choice
+    action = request.form.get('action')
+    if action == 'accept':
+        booking.accepted = True
+        flash("Booking request accepted!", "success")
+    elif action == 'decline':
+        booking_repo.remove_booking(booking_id)
+        flash("Booking request declined.", "info")
+    else:
+        flash("Invalid action.", "error")
+        return redirect(url_for('get_space_info_route', id=space.id))
+    
+    # Save changes to the booking
+    booking_repo.add_booking(booking)  # Update status to accepted or remove if declined
+    return redirect(url_for('get_space_info_route', id=space.id))
 
 
 @app.route('/sign-up', methods=['GET','POST'])

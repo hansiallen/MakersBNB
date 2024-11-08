@@ -33,11 +33,12 @@ class BookingRepo:
                 booking_data['space_id'],
                 booking_data['user_id'],
                 booking_data['start_date'],
-                booking_data['end_date']
+                booking_data['end_date'],
+                booking_data['accepted']
             )
         return None
 
     def list_bookings(self):
         query = "SELECT * FROM bookings"
         results = self.db_connection.execute(query)
-        return [Booking(row['booking_id'], row['space_id'], row['user_id'], row['start_date'], row['end_date']) for row in results]
+        return [Booking(row['booking_id'], row['space_id'], row['user_id'], row['start_date'], row['end_date'],row['accepted']) for row in results]
