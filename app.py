@@ -28,6 +28,14 @@ def load_user(user_id):
 
 
 # == Your Routes Here ==
+# GET /index
+# Returns the homepage
+# Try it:
+#   ; open http://localhost:5001/index
+
+@app.route('/index', methods=['GET'])
+def get_index_route():
+    return render_template('index.html')
 
 # GET /index
 # Returns the homepage
