@@ -1,0 +1,20 @@
+{% include '/core/header.html' %}
+{% include '/core/nav.html' %}
+
+<main>
+    <h1>Request Booking for {{ space.name }}</h1>
+    <p>{{ space.description }}</p>
+    <p>Price: £{{ space.price_per_night }} per night</p>
+
+    <form action="{{ url_for('request_booking', id=space.id) }}" method="POST">
+        <label for="start_date">Start Date</label>
+        <input type="date" name="start_date" id="start_date" required>
+        
+        <label for="end_date">End Date</label>
+        <input type="date" name="end_date" id="end_date" required>
+
+        <button type="submit">Send Booking Request</button>
+    </form>
+</main>
+
+{% include '/core/footer.html' %}

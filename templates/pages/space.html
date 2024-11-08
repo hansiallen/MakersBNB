@@ -6,5 +6,21 @@
     <p>Price: £{{ space.price_per_night }}</p>
     
     <p class="booking-info">To book the following space, text 07700 900000</p>
+
+    {% if current_user.is_authenticated and current_user.id == space.owner_id %}
+    <h2>Pending Booking Requests</h2>
+    {% for booking in bookings %}
+    <div class="booking-request">
+        <p>Requested by: User {{ booking.user_id }}</p>
+        <p>Start Date: {{ booking.start_date }}</p>
+        <p>End Date: {{ booking.end_date }}</p>
+        <form action="{{ url_for('confirm_booking', booking_id=booking.booking_id) }}" method="POST">
+            <button type="submit" name="action" value="accept">Accept</button>
+            <button type="submit" name="action" value="decline">Decline</button>
+        </form>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
 </main>
 {% include '/core/footer.html' %}
