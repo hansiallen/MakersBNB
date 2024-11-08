@@ -50,22 +50,21 @@ def get_spaces_route():
 
 
 @app.route('/create-space-listing', methods=['GET', 'POST'])
-@login_required  # Ensures user must be logged in
+@login_required
 def add_spaces_route():
     if request.method == 'POST':
         # Collect data from the form
-        name = request.form['name'].strip()
-        description = request.form['description'].strip()
-        price_per_night = request.form['price_per_night'].strip()
-        location = request.form['location'].strip()
-        capacity = request.form['capacity'].strip()
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+        price_per_night = request.form.get('price-per-night', '').strip()
+        location = request.form.get('location', '').strip()
+        capacity = request.form.get('capacity', '').strip()
 
         # Basic form validation
         if not name or not description or not price_per_night or not location or not capacity:
             flash('All fields are required.', 'error')
             return redirect(url_for('add_spaces_route'))  # Redirect back if validation fails
         
-        # Try to add the space to the database
         try:
             # Initialize the repo to interact with the database
             spaces_repo = SpacesRepo(get_flask_database_connection(app))
