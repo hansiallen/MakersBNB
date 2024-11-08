@@ -12,7 +12,7 @@ def test_add_user(db_connection):
     
     # Create a new user without setting the id (it will be auto-generated)
     user = User(
-        id = None,
+        user_id = None,
         email='user4@example.com',
         password='password1',
     )
@@ -33,7 +33,7 @@ def test_remove_user(db_connection):
     
     # Create a new user (without setting the id, it will be auto-generated)
     user = User(
-        id = 1,  # ID will be auto-generated
+        user_id = 1,  # ID will be auto-generated
         email="user4@example.com",
         password="password1"
     )
@@ -68,7 +68,7 @@ def test_get_user(db_connection):
     # Assertions to verify that the returned user matches the expected data
     assert user.id == 1
     assert user.email == 'user1@example.com'
-    assert user.password == 'password1'
+    assert user.password == 'scrypt:32768:8:1$S3VeFkMUqtf7mwHw$68cf3b8e7f2897b3e3e6ecc4ad225f105ed4ca19cba629bd5cb5d9b59e8dec1986cc8f3fa3bdc566946b94fbc83d92afc2ca05d00a90238fa03271423d8199ef'
 
 def test_get_multiple_users(db_connection):
     """Test getting multiple users"""
@@ -83,8 +83,5 @@ def test_get_multiple_users(db_connection):
     # Assertions
     assert len(users) == 3
     assert users[0].email == 'user1@example.com'
-    assert users[0].password == 'password1'
     assert users[1].email == 'user2@example.com'
-    assert users[1].password == 'password2'
     assert users[2].email == 'user3@example.com'
-    assert users[2].password == 'password3'

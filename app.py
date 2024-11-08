@@ -4,15 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from lib.database_connection import get_flask_database_connection
 from lib.spaces_repo import SpacesRepo
 from lib.spaces import Space
-from lib.auth import login_manager, User, LoginManager
 from flask_login import login_required, current_user, logout_user, login_user
+from lib.user_repo import UserRepo, User
+from lib.auth import login_manager, LoginManager
 
-from lib.user_repo import UserRepo
-from lib.database_connection import DatabaseConnection
-
-db_connection = DatabaseConnection()
-db_connection.connect() 
-user_repo = UserRepo(db_connection)  
+    
 
 # Create a new Flask app
 app = Flask(__name__)
@@ -27,8 +23,8 @@ login_manager.login_view = 'login'  # Redirect to the login route when needed
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_repo = UserRepo(db_connection)  # Assuming db_connection is initialized
-    return user_repo.get_user_by_id(user_id)
+    user_repo = UserRepo(get_flask_database_connection(app))  # Assuming db_connection is initialized
+    return user_repo.get_user_by_email(user_id)
 
 
 # == Your Routes Here ==
@@ -49,7 +45,7 @@ def get_index_route():
 def get_spaces_route():
     repo = SpacesRepo(get_flask_database_connection(app))
     spaces =repo.list_spaces()
-    return render_template('/pages/list-spaces.html', spaces =spaces)
+    return render_template('/pages/list-spaces.html', spaces =spaces, logged_in= current_user.is_authenticated)
 
 
 @app.route('/add-spaces',methods=['POST'])
@@ -60,27 +56,53 @@ def add_spaces_route():
 
 @app.route('/space/<id>',methods=['GET'])
 def get_space_info_route(id):
-    # have an argument with the space id to show the correct space
-    return render_template('/pages/space.html')
+    spaces_repo = SpacesRepo(get_flask_database_connection(app))
+    space = spaces_repo.get_space(id)
+
+    # Maybe create a 404.html for this kind of thing
+    if not space:
+        return "Couldn't find the space you're looking for", 404
+    
+    return render_template('pages/space.html', space=space)
 
 
-@app.route('/sign-up', methods=['GET'])
-def get_sign_up_route():
-    # should return a full login page
-    return render_template('/pages/sign-up.html')
-
-
-
-@app.route('/sign-up', methods=['POST'])
-def try_sign_up_route():
+@app.route('/sign-up', methods=['GET','POST'])
+def sign_up():
     # takes username, email and password from a form
     # should give a return message as a either
     #  sucseffuly created in or incorrect email or password
-    pass
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        print(f'Attempting login with email: {email}')
+        
+        user_repo = UserRepo(get_flask_database_connection(app))
+        user = user_repo.add_user(User(None,email,generate_password_hash(password)))
+        user = user_repo.get_user_by_email(email)
+        if user:
+            print(f'User found: {user.email}')
+            if check_password_hash(user.password, password):
+                print('Password is correct, logging in...')
+                login_user(user)
+                return redirect(url_for('protected'))  # Redirect to the protected page after successful login
+            else:
+                print(user.password)
+                print(password)
+                print('Incorrect password')
+                flash('Incorrect password', 'error')
+        else:
+            print('User not found')
+            flash('User not found', 'error')
+        
+        # If login fails, redirect to the login page with a flash message
+        return redirect(url_for('login'))
+    
+    # should return a full login page
+    return render_template('/pages/sign-up.html')
 
 @app.route('/about', methods=['GET'])
 def render_about_page():
-    return render_template('pages/about.html')
+    return render_template('pages/about.html', is_about= True)
 
 @app.route('/privacy', methods=['GET'])
 def render_privacy_policy():
@@ -97,33 +119,50 @@ def render_tos_page():
 
 # Routes
 
-
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        print(f'Attempting login with email: {email}')
-        
-        user_repo = UserRepo(db_connection)
-        user = user_repo.get_user_by_email(email)
-        if user:
-            print(f'User found: {user.email}')
-            if check_password_hash(user.password, password):
-                print('Password is correct, logging in...')
-                login_user(user)
-                return redirect(url_for('protected'))  # Redirect to the protected page after successful login
+        try:
+            # Attempt to get email and password from the form
+            email = request.form['email'].strip()
+            password = request.form['password'].strip()
+            
+            # Check if either field is empty
+            if not email or not password:
+                flash('Email and password cannot be empty.', 'error')
+                return redirect(url_for('login'))
+
+            print(f'Attempting login with email: {email}')
+            
+            # Initialize UserRepo and fetch user by email
+            user_repo = UserRepo(get_flask_database_connection(app))
+            user = user_repo.get_user_by_email(email)
+            
+            if user:
+                print(f'User found: {user.email}')
+                
+                # Check if the provided password matches the stored hash
+                if check_password_hash(user.password, password):
+                    print('Password is correct, logging in...')
+                    login_user(user)
+                    return redirect(url_for('protected'))  # Redirect on success
+                else:
+                    print('Incorrect password')
+                    flash('Incorrect password', 'error')
             else:
-                print('Incorrect password')
-                flash('Incorrect password', 'error')
-        else:
-            print('User not found')
-            flash('User not found', 'error')
-        
-        # If login fails, redirect to the login page with a flash message
-        return redirect(url_for('login'))
+                print('User not found')
+                flash('User not found', 'error')
+
+            # Redirect to login on failure
+            return redirect(url_for('login'))
+
+        except KeyError as e:
+            # Handle missing form fields
+            flash(f'Missing field: {e.args[0]}', 'error')
+            return redirect(url_for('login'))
     
+    # Render login form for GET request
     return render_template('pages/login.html')
 
 # Protected route
@@ -136,9 +175,8 @@ def protected():
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()  # Log the user out
     print(f'Logged out user {current_user.id}')  # Optional debug info
+    logout_user()  # Log the user out
     return redirect(url_for('get_spaces_route'))  # Redirect to spaces list after logout
-
 if __name__ == '__main__':
     app.run(debug=True, port=int(os.environ.get('PORT', 5001)))

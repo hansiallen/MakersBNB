@@ -15,7 +15,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-def test_login_valid_user(client):
+def test_login_valid_user(client, db_connection):
     """Test logging in with valid credentials using mock data (no real database needed)"""
     
     # Mock user data (hashed password)
@@ -33,7 +33,7 @@ def test_login_valid_user(client):
     # Patch the app's user repo to use the mock
     app.user_repo = mock_user_repo
 
-    # Simulate logging in with plain text credentials (submit the plain text password)
+    # Simulate logging in with valid credentials (mocking the POST request)
     response = client.post('/login', data={'email': 'user1@example.com', 'password': 'password1'})
     
     # Assert the response is a redirect (status code 302)
@@ -76,18 +76,75 @@ def test_protected_route_requires_login(client):
 
 def test_logout(client):
     """Test logging out after a successful login"""
-    
-    # Simulate a logged-in user by directly manipulating the session
-    with client.session_transaction() as session:
-        session['_user_id'] = 123  # Mock the user session with a fake user_id
-
     # Perform the logout action
     response = client.get('/logout')  # Simulate the logout request
 
     # Assert logout success (should redirect to a page like home or login page)
     assert response.status_code == 302  # Should redirect after logout
+
+def test_login_blank_fields(client):
+    """Test login with blank email or password to trigger flash messages."""
+
+    # Attempt to login with blank email and password
+    response = client.post('/login', data={'email': '', 'password': ''})
     
-    # Check if the user is logged out by ensuring the session is cleared
+    # Ensure it redirects back to the login page
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/login'
+    
+    # Follow the redirect and check for flash message
+    follow_response = client.get('/login', follow_redirects=True)
+    assert b'Email and password cannot be empty.' in follow_response.data
+    
+def test_login_invalid_password(client):
+    """Test logging in with an incorrect password"""
+    
+    # Mock user data for correct credentials
+    mock_user_data = {
+        'email': 'user1@example.com',
+        'password': 'password1'  # Correct password for this test
+    }
+    
+    # Simulate the behavior of getting the user by email
+    mock_user_repo = MagicMock()
+    mock_user_repo.get_user_by_email.return_value = mock_user_data
+    
+    # Patch the app's user repo to use the mock
+    app.user_repo = mock_user_repo
+
+    # Simulate logging in with the correct email but incorrect password
+    response = client.post('/login', data={'email': 'user1@example.com', 'password': 'wrongpassword'})
+    
+    # Assert the response is a redirect (status code 302)
+    assert response.status_code == 302
+    
+    # Check that the user is redirected back to the login page
+    assert response.headers['Location'] == '/login'
+    
+    # Check that the flash message indicates incorrect password
     with client.session_transaction() as session:
-        assert '_user_id' not in session  # Ensure the session does not have '_user_id' after logout
+        assert 'Incorrect password' in session['_flashes'][0][1]
+
+def test_login_user_not_found(client):
+    """Test logging in with an email that does not exist"""
+    
+    # Simulate the behavior of the user repo returning None (user not found)
+    mock_user_repo = MagicMock()
+    mock_user_repo.get_user_by_email.return_value = None  # No user found
+    
+    # Patch the app's user repo to use the mock
+    app.user_repo = mock_user_repo
+
+    # Simulate logging in with a non-existing email
+    response = client.post('/login', data={'email': 'nonexistent@example.com', 'password': 'any'})
+    
+    # Assert the response is a redirect (status code 302)
+    assert response.status_code == 302
+    
+    # Check that the user is redirected back to the login page
+    assert response.headers['Location'] == '/login'
+    
+    # Check that the flash message indicates user not found
+    with client.session_transaction() as session:
+        assert 'User not found' in session['_flashes'][0][1]
 

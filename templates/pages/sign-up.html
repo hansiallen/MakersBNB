@@ -4,17 +4,17 @@
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quam lacus, vestibulum nec eleifend in, dignissim nec ex. Duis non enim ut nunc luctus hendrerit fringilla id metus. Morbi vitae ornare mi, sit amet pretium velit. Praesent laoreet mi sit amet fermentum varius. Praesent nisi augue, efficitur porta ullamcorper pulvinar, vulputate ut est. Mauris et massa eros. Phasellus nisi ante, vehicula et ultricies et, varius eu mi.</p>
 <h2>Sign up to MakersBnB</h2>
 <div class="login-box">
-    <form action="./" method="POST">
+    <form action="./sign-up" method="POST">
         {% if error %}
         <!-- If so, print the error -->
         <p class="error">Sign up error: {{ error }}</p>
         {% endif %}
         <label for="email">Email Address</label>
-        <input type="text" name="email" id="email" placeholder="email@example.com">
+        <input required type="text" name="email" id="email" placeholder="email@example.com">
         <label for="password">Password</label>
-        <input type="text" name="password" id="password" placeholder="********">
+        <input required type="password" name="password" id="password" placeholder="********">
         <label for="confirm-password">Confirm Password</label>
-        <input type="text" name="confirm-password" id="confirm-password" placeholder="********">
+        <input required type="password" name="confirm-password" id="confirm-password" placeholder="********">
         <button type="submit">Sign up</button>
     </form>
 </div>
